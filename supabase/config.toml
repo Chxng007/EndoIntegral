@@ -1,0 +1,13 @@
+project_id = "endointegral"
+[auth]
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173/ingresar?modo=contrasena"]
+enable_signup = false
+[functions.contact]
+verify_jwt = false
+[functions.invite-member]
+verify_jwt = false
+[functions.delete-account]
+verify_jwt = false
+[functions.notify-team]
+verify_jwt = false

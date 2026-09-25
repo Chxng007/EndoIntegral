@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env*
+!.env.example
+.tools/
+test-results/
+playwright-report/
+artifacts/

@@ -1,0 +1,57 @@
+Estructura de la Página Web y Contenido
+Página de Inicio (Pública): Presenta el propósito de la plataforma con un mensaje claro y empático que valide el dolor de las usuarias, mostrando la misión, la visión de nuestro programa.
+Cabecera y Bienvenida Pública: Mantiene el diseño de nuestro logo de EndoIntegral, el eslogan ”Cuerpo, mente y bienestar en equilibrio”, el botón de “Contáctanos” y la opción de “Iniciar Sesión” para los usuarios que ya adquirieron el programa.
+
+Sección Educativa Abierta (publica):  Presenta la introducción “Hablemos de endometriosis” Explica de forma científica Pero accesible que es la enfermedad y el desglose de síntomas frecuentes (dolor pélvico, fatiga, infertilidad, etc.) de libre acceso para generar conciencia y empatía en cualquier visitante. 
+
+
+Sección de Programas y Paquetes (Pública / Venta): Detalla los beneficios del programa de pago, explicando qué incluye el acceso ilimitado y el botón directo para adquirir la membresía y obtener credenciales de ingreso.
+
+Bloque de Validación Emocional: El mensaje destacado de que "No eres una exagerada” y que el dolor merece atención especializada, sirviendo de puente emocional para conectar con la necesidad de un tratamiento integral.
+
+
+Área de Miembros (Privada – Con Usuario y Contraseña): El espacio exclusivo para quienes pagaron el programa, donde se desbloquea todo el contenido avanzado. 	Habrá una Sección “Acceso al Programa y Membresía” este  será  un espacio dedicado a explicar qué incluye el paquete de pago (acceso ilimitado, dinámicas de gamificación, cofres de calma y el sistema de niveles por hitos). Incluye un botón directo de compra que genera el usuario y contraseña tras el pago.
+
+Vista previa bloqueada: Un adelanto visual del mapa de niveles (Calma y Brisa, Tormenta, Renacer) con un icono de candado, indicando que al adquirir el paquete la usuaria podrá registrar sus hábitos diarios, sumar puntos y desbloquear todo el contenido interactivo.
+
+Panel de Gamificación y Hábitos (Privada): Un espacio interactivo donde las usuarias registran sus avances diarios y hábitos saludables para sumar puntos simbólicos y desbloquear recursos emocionales. Registro Diario de Hábitos (Check-in): Cada día, la usuaria ingresa a su panel y marca pequeñas acciones de autocuidado (ej. “Realicé mis ejercicios de respiración”, “Registré mi nivel de dolor", "Seguí la pauta nutricional antiinflamatoria”).
+
+Señalización de Niveles e Hitos (Privada): Un mapa visual del proceso de resiliencia dividido en las etapas. En lugar de números genéricos, el progreso desbloquea fases temáticas inspiradas en el clima y la naturaleza:
+Fase 1: Calma y Brisa (Prevención): Nivel inicial enfocado en días estables, donde se practican hábitos preventivos y se consolida la estabilidad emocional. Al registrar constancia, se desbloquean infografías descargables y meditaciones guiadas breves.
+Fase 2: Tormenta (Afrontamiento del Dolor): Un espacio adaptado para los momentos de crisis o síntomas agudos. Al activarlo, la plataforma despliega de inmediato los “Cofres de Calma” (audios de relajación profunda, técnicas de distracción y acceso rápido a soporte o chat con profesionales). Superar los registros en días difíciles otorga insignias de resiliencia.
+Fase 3: Renacer / Después de la Lluvia (Fortalecimiento): Etapa donde la usuaria evalúa sus avances mensuales, reconoce su propia fuerza ante el diagnóstico y consolida el uso de sus redes de apoyo dentro de la comunidad.
+Sistema de Recompensas y Beneficios: Acumular registros exitosos en estas dinámicas permite desbloquear beneficios reales dentro del programa, tales como descuentos en consultas de acompañamiento psicológico o nutricional, acceso prioritario a talleres en vivo o recursos exclusivos de bienestar emocional.
+
+
+Directorio de Tratamientos y Recursos (Privada): Guías profundas sobre manejo farmacológico, opciones de cirugía laparoscópica, fisioterapia pélvica, nutrición antiinflamatoria y apoyo psicológico.
+10.Biblioteca de Recursos Profundos (Contenido Avanzado) privado El Podcast Exclusivo "Endo-Voces"
+​Acceso Exclusivo: Este formato se aloja directamente dentro del área privada del programa, protegido por el usuario y contraseña que obtiene cada paciente al adquirir la membresía, manteniéndose cerrado al público general.
+​Diseño para Días de Fatiga: Los episodios están pensados para consumirse fácilmente cuando la usuaria tiene poca energía o se encuentra en días de dolor, permitiéndole escuchar contenido mientras descansa acostada.
+​Contenido y Temáticas: Conversaciones íntimas, entrevistas a especialistas (psicólogos, ginecólogos, nutricionistas) y testimonios reales de resiliencia frente a la endometriosis.
+​Integración con la Gamificación: Escuchar capítulos del podcast o reflexionar sobre ellos puede sumar puntos simbólicos dentro del sistema de hábitos y desbloquear logros en el mapa de etapas (Calma y Brisa, Tormenta, Renacer).
+
+11-  CALENDARIO 
+Se integra dentro de la plataforma digital privada un espacio de autogestión clínica y seguimiento diario con las siguientes características, para que se utilizar: 
+
+ Colocar el  ciclo menstrual y registro sintomático: Permite a las pacientes rastrear los días de menstruación, intensidad del dolor pélvico, fatiga o crisis inflamatorias, conectando con las etapas de resiliencia del modelo.
+
+Agenda de citas y controles médicos: Espacio para consignar y visualizar fechas, horas y especialidades de las consultas de ginecología, psicología, nutrición u otros aliados.
+
+Control de horarios de medicación: Registro personalizado de los fármacos o pautas de tratamiento prescritas con su respectiva periodicidad.
+
+Sistema de alarmas y recordatorios inteligentes: Notificaciones push, en plataforma o vía canal directo que le recuerdan de forma oportuna a la paciente la proximidad de su cita médica o la hora exacta de toma de sus medicamentos.
+
+
+12. Tenemos un perfil de Instagram llamado endo_integral queremos que la página web conecte con el Instagram 
+
+13. Mapeo Corporal de Dolor Multidimensional (Body-Trigger Map) 
+Interfaz Anatómica (Avatar 2D/3D limpio y clínico):La usuaria abra una opción en la página donde debe tocar  una  silueta corporal.
+Selecciona zonas específicas con capas de profundidad (pelvis central, suelo pélvico, irradiación a miembro inferior derecho, diafragma/hombro derecho) 
+Taxonomía del Dolor (Más allá del 1-10):
+Desplegable rápido de cualidad del dolor: punzante, cólico/retortijón, quemazón, pesadez/fatiga muscular profunda, o “congelamiento” articular. 
+El Entregable Clínico: El “Reporte de Patrones para Ginecología”
+Un PDF ejecutivo de 1 página o vista interactiva “Modo Consulta Médica” que la paciente genera con un botón (“Exportar para mi ginecóloga”) que contiene:
+Mapa de calor acumulado del mes: Zonas con mayor recurrencia.
+Correlación cruzada clave (Ejemplo real generable por el algoritmo):
+Ejemplo “En fase lútea tardía (días 21-27), el 75% de los registros de dolor lumbar/pélvico con cualidad ‘quemazón’ coexisten con desviación del protocolo de nutrición antiinflamatoria o reportes de estrés > 4/5.”
+(Tener en cuenta si se puede llevar a cabo la idea 13 del Mapeo corporal) 
