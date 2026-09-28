@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 @theme {
   --color-cream: #fff9ee;
   --color-lavender: #cbb4e6;
@@ -7,9 +8,25 @@
   --font-sans: 'Nunito', sans-serif;
   --font-serif: 'Playfair Display', Georgia, serif;
 }
+
 :root {
-  --cream: #fff9ee; --lavender: #cbb4e6; --lavender-deep: #8e6cb3; --lavender-700: #6b4a91;
-  --rose: #e7c6d8; --rose-cta: #b16b96; --yellow: #fde7a7; --plum: #3b2a4d; --muted: #74647e;
-  --border: #eaddE9; --paper: #fffefd; --serif: 'Playfair Display', Georgia, serif; --sans: 'Nunito', sans-serif;
-  color: var(--plum); background: var(--cream); font-family: var(--sans); font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased;
+  --cream: #fff9ee;
+  --lavender: #cbb4e6;
+  --lavender-deep: #8e6cb3;
+  --lavender-700: #6b4a91;
+  --rose: #e7c6d8;
+  --rose-cta: #b16b96;
+  --yellow: #fde7a7;
+  --plum: #3b2a4d;
+  --muted: #74647e;
+  --border: #eaddE9;
+  --paper: #fffefd;
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'Nunito', sans-serif;
+  color: var(--plum);
+  background: var(--cream);
+  font-family: var(--sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }

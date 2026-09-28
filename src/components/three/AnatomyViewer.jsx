@@ -1,12 +1,109 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { Expand, Move, Pause, Play, RotateCcw } from 'lucide-react';
-import { ErrorBoundary } from '../ui';
-import { useReducedMotion } from '../../lib/hooks';
-const SceneCanvas=lazy(()=>import('./SceneCanvas'));
-function Poster() { return <img className="model-poster" src="/img/modelo-poster.svg" alt="Ilustración del útero, las trompas de Falopio y los ovarios en tonos rosa y lavanda"/>; }
-export default function AnatomyViewer({ mode='anatomia', hero=false, scrollDissolve=hero }) {
-  const [paused,setPaused]=useState(false),[ready,setReady]=useState(false),[reset,setReset]=useState(0),[support,setSupport]=useState(true);const ref=useRef();const reduced=useReducedMotion();
-  useEffect(()=>{try{const el=document.createElement('canvas');const ctx=el.getContext('webgl2')||el.getContext('webgl');setSupport(Boolean(ctx));ctx?.getExtension('WEBGL_lose_context')?.loseContext();}catch{setSupport(false);}},[]);
-  useEffect(()=>{if(!hero||reduced)return;const el=ref.current; const fn=()=>{ const rect=el.getBoundingClientRect(); const fade=Math.max(.12, Math.min(1,1+rect.top/window.innerHeight));el.style.setProperty('--scroll-fade',fade);};window.addEventListener('scroll',fn,{passive:true});return()=>window.removeEventListener('scroll',fn);},[hero,reduced]);
-  return <div className={`anatomy-viewer ${hero?'hero-viewer':''}`} ref={ref}><div className="anatomy-orbit orbit-one"/><div className="anatomy-orbit orbit-two"/><span className="anatomy-spark spark-one">✦</span><span className="anatomy-spark spark-two">✦</span><div className="anatomy-label label-top"><span/>Conocer tu cuerpo<br/><strong>es empezar a cuidarte.</strong></div><ErrorBoundary fallback={<Poster/>}>{support?<Suspense fallback={<Poster/>}><SceneCanvas key={reset} mode={mode} paused={paused} dissolveOnScroll={scrollDissolve} onReady={()=>setReady(true)}/></Suspense>:<Poster/>}</ErrorBoundary><div className="anatomy-label label-bottom"><span className="small-dot"/>TU BIENESTAR, EN EL CENTRO</div><div className="viewer-toolbar"><span><Move size={14}/>{ready&&support?'Arrastra para explorar':'Ilustración anatómica'}</span>{support&&ready&&<div><button className="icon-button" onClick={()=>setPaused(!paused)} aria-label={paused?'Reanudar animación':'Pausar animación'}>{paused?<Play size={15}/>:<Pause size={15}/>}</button><button className="icon-button" onClick={()=>setReset(reset+1)} aria-label="Restablecer vista"><RotateCcw size={15}/></button></div>}</div></div>;
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { Expand, Move, Pause, Play, RotateCcw } from "lucide-react";
+import { ErrorBoundary } from "../ui";
+import { useReducedMotion } from "../../lib/hooks";
+const SceneCanvas = lazy(() => import("./SceneCanvas"));
+function Poster() {
+  return (
+    <img
+      className="model-poster"
+      src="/img/modelo-poster.svg"
+      alt="Ilustración del útero, las trompas de Falopio y los ovarios en tonos rosa y lavanda"
+    />
+  );
+}
+export default function AnatomyViewer({
+  mode = "anatomia",
+  hero = false,
+  scrollDissolve = hero,
+}) {
+  const [paused, setPaused] = useState(false),
+    [ready, setReady] = useState(false),
+    [reset, setReset] = useState(0),
+    [support, setSupport] = useState(true);
+  const ref = useRef();
+  const reduced = useReducedMotion();
+  useEffect(() => {
+    try {
+      const el = document.createElement("canvas");
+      const ctx = el.getContext("webgl2") || el.getContext("webgl");
+      setSupport(Boolean(ctx));
+      ctx?.getExtension("WEBGL_lose_context")?.loseContext();
+    } catch {
+      setSupport(false);
+    }
+  }, []);
+  useEffect(() => {
+    if (!hero || reduced) return;
+    const el = ref.current;
+    const fn = () => {
+      const rect = el.getBoundingClientRect();
+      const fade = Math.max(
+        0.12,
+        Math.min(1, 1 + rect.top / window.innerHeight),
+      );
+      el.style.setProperty("--scroll-fade", fade);
+    };
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
+  }, [hero, reduced]);
+  return (
+    <div className={`anatomy-viewer ${hero ? "hero-viewer" : ""}`} ref={ref}>
+      <div className="anatomy-orbit orbit-one" />
+      <div className="anatomy-orbit orbit-two" />
+      <span className="anatomy-spark spark-one">✦</span>
+      <span className="anatomy-spark spark-two">✦</span>
+      <div className="anatomy-label label-top">
+        <span />
+        Conocer tu cuerpo
+        <br />
+        <strong>es empezar a cuidarte.</strong>
+      </div>
+      <ErrorBoundary fallback={<Poster />}>
+        {support ? (
+          <Suspense fallback={<Poster />}>
+            <SceneCanvas
+              key={reset}
+              mode={mode}
+              paused={paused}
+              dissolveOnScroll={scrollDissolve}
+              onReady={() => setReady(true)}
+            />
+          </Suspense>
+        ) : (
+          <Poster />
+        )}
+      </ErrorBoundary>
+      <div className="anatomy-label label-bottom">
+        <span className="small-dot" />
+        TU BIENESTAR, EN EL CENTRO
+      </div>
+      <div className="viewer-toolbar">
+        <span>
+          <Move size={14} />
+          {ready && support
+            ? "Arrastra para explorar"
+            : "Ilustración anatómica"}
+        </span>
+        {support && ready && (
+          <div>
+            <button
+              className="icon-button"
+              onClick={() => setPaused(!paused)}
+              aria-label={paused ? "Reanudar animación" : "Pausar animación"}
+            >
+              {paused ? <Play size={15} /> : <Pause size={15} />}
+            </button>
+            <button
+              className="icon-button"
+              onClick={() => setReset(reset + 1)}
+              aria-label="Restablecer vista"
+            >
+              <RotateCcw size={15} />
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
