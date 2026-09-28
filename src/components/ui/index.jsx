@@ -117,7 +117,7 @@ export function Field({ label, error, children, ...props }) {
     </div>
   );
 }
-export function Modal({ title, children, onClose }) {
+export function Modal({ title, eyebrow = "ENDOINTEGRAL", children, onClose }) {
   const ref = useRef();
   const heading = useId();
   useEffect(() => {
@@ -140,16 +140,26 @@ export function Modal({ title, children, onClose }) {
       }}
     >
       <div className="modal-head">
-        <h2 id={heading}>{title}</h2>
+        <img
+          className="modal-logo"
+          src="/img/logo-circular.jpeg"
+          alt=""
+          width="58"
+          height="58"
+        />
+        <div>
+          <p className="modal-eyebrow">{eyebrow}</p>
+          <h2 id={heading}>{title}</h2>
+        </div>
         <button
           onClick={onClose}
-          className="icon-button"
+          className="icon-button modal-close"
           aria-label="Cerrar ventana"
         >
           <X />
         </button>
       </div>
-      {children}
+      <div className="modal-body">{children}</div>
     </dialog>
   );
 }

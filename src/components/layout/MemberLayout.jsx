@@ -31,7 +31,11 @@ import { Badge, Button, EmptyState, Modal } from "../ui";
 import { PodcastProvider, PersistentPlayer } from "../video/PodcastPlayer";
 export function UrgentHelp({ onClose }) {
   return (
-    <Modal title="Busca acompañamiento ahora" onClose={onClose}>
+    <Modal
+      title="Busca acompañamiento ahora"
+      eyebrow="ESTAMOS CONTIGO"
+      onClose={onClose}
+    >
       <p>
         Si estás en peligro inmediato o necesitas atención urgente, comunícate
         con emergencias o acude al servicio de urgencias más cercano.

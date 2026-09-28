@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  ArrowLeft,
   ArrowRight,
   BookOpen,
   Download,
@@ -155,6 +156,13 @@ function softBell() {
     /* Audio is optional. */
   }
 }
+export function BackToResources() {
+  return (
+    <Link to="/app/recursos" className="back-link">
+      <ArrowLeft size={15} aria-hidden="true" /> Volver a Recursos
+    </Link>
+  );
+}
 export function Yoga() {
   const [step, setStep] = useState(0),
     [remaining, setRemaining] = useState(poses[0].seconds),
@@ -186,6 +194,7 @@ export function Yoga() {
   }
   return (
     <>
+      <BackToResources />
       <MemberTitle
         eyebrow="MOVIMIENTO · RESPIRACIÓN · BIENESTAR"
         title="Yoga terapia para la"
@@ -211,13 +220,13 @@ export function Yoga() {
       <div className="yoga-grid">
         {poses.map((p, i) => (
           <article className="yoga-pose" key={p.name}>
-            <div
+            <img
               className="pose-image"
-              role="img"
-              aria-label={`Ilustración: ${p.name}`}
-              style={{
-                backgroundPosition: `${[1, 33, 66, 99][i % 4]}% ${i < 4 ? "47%" : "83%"}`,
-              }}
+              src={`/img/poses/postura-${i + 1}.webp`}
+              alt={`Ilustración: ${p.name}`}
+              width="464"
+              height="380"
+              loading="lazy"
             />
             <div className="pose-copy">
               <span className="pose-number">POSTURA 0{i + 1}</span>
@@ -325,6 +334,7 @@ export function Mindfulness() {
     count = cycle < 4 ? 4 - cycle : cycle < 8 ? 8 - cycle : 14 - cycle;
   return (
     <>
+      <BackToResources />
       <MemberTitle
         eyebrow="RESPIRA · CONECTA · PRESENTE"
         title="Meditaciones mindfulness"

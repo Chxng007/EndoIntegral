@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   Heart,
   Camera as Instagram,
+  LayoutGrid,
   Menu,
   X,
   UserRound,
@@ -34,11 +35,9 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const { user, profile } = useAuth();
   const { pathname } = useLocation();
-  // Con sesión iniciada se muestra el nombre de la persona en lugar de «Mi cuenta».
-  const accountLabel = user
-    ? firstName(profile) || "Mi espacio"
-    : "Mi cuenta";
-  const accountTo = user ? "/app" : "/ingresar";
+  // Con sesión iniciada: «Mi espacio» en el menú y el nombre de la persona lleva a su cuenta.
+  const accountLabel = user ? firstName(profile) || "Mi cuenta" : "Mi cuenta";
+  const accountTo = user ? "/app/cuenta" : "/ingresar";
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
@@ -64,6 +63,17 @@ export function Navbar() {
               {label}
             </NavLink>
           ))}
+          {user && (
+            <NavLink
+              to="/app"
+              className={({ isActive }) =>
+                `nav-space ${isActive && !pathname.startsWith("/app/cuenta") ? "active" : ""}`
+              }
+            >
+              <LayoutGrid size={15} aria-hidden="true" />
+              Mi espacio
+            </NavLink>
+          )}
           <div className="mobile-nav-actions">
             <Button to={accountTo} variant="secondary">
               <UserRound size={15} aria-hidden="true" />
@@ -77,10 +87,17 @@ export function Navbar() {
         <div className="nav-actions">
           <Link
             to={accountTo}
-            className="account-link"
-            aria-label={user ? `Mi espacio (${accountLabel})` : "Mi cuenta"}
+            className={`account-link ${user ? "is-signed" : ""}`}
+            aria-label={user ? `Mi cuenta (${accountLabel})` : "Mi cuenta"}
+            title={user ? "Configurar mi cuenta" : undefined}
           >
-            <UserRound size={17} aria-hidden="true" />
+            {user ? (
+              <span className="account-avatar" aria-hidden="true">
+                {accountLabel[0]?.toUpperCase()}
+              </span>
+            ) : (
+              <UserRound size={17} aria-hidden="true" />
+            )}
             <span className="account-name">{accountLabel}</span>
           </Link>
           <Button to="/contacto">

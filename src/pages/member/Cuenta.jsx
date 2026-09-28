@@ -1,14 +1,21 @@
 import { useState } from "react";
-import { Download, Trash2 } from "lucide-react";
+import { Download, Pencil, Trash2 } from "lucide-react";
 import { MemberTitle } from "../../components/layout/MemberLayout";
 import { Button, Field, Modal, Notice, useToast } from "../../components/ui";
 import { useAuth } from "../../lib/auth";
 import { result, supabase } from "../../lib/supabase";
-import { planNames } from "../../lib/plans";
+import { isAdmin, planNames } from "../../lib/plans";
 export default function Cuenta() {
-  const { profile, user, signOut } = useAuth();
+  const { profile, setProfile, user, signOut } = useAuth();
   const [remove, setRemove] = useState(false),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [editing, setEditing] = useState(false);
+  const admin = isAdmin(profile);
+  const initials = profile.nombre
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase())
+    .join("");
   const toast = useToast();
   async function exportData() {
     setBusy(true);
@@ -58,13 +65,85 @@ export default function Cuenta() {
         accent="cuenta"
         description="Gestiona tu información y tus preferencias de acceso."
       />
-      <div className="card">
-        <h3>{profile.nombre}</h3>
-        <p>{user.email}</p>
-        <p style={{ marginTop: 10 }}>
-          Plan: {planNames[profile.plan] || profile.plan} · Estado:{" "}
-          {profile.activo ? "Activo" : "Inactivo"}
-        </p>
+      <div className="card profile-card">
+        <span className="profile-avatar" aria-hidden="true">
+          {initials}
+        </span>
+        <div className="profile-info">
+          {editing ? (
+            <form
+              className="profile-name-form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const nombre = new FormData(e.currentTarget).get("nombre");
+                setBusy(true);
+                try {
+                  const { data, error } = await supabase.rpc("update_my_name", {
+                    new_name: nombre,
+                  });
+                  if (error)
+                    throw new Error(
+                      error.message.includes("caracteres")
+                        ? error.message
+                        : "No pudimos guardar tu nombre. Intenta nuevamente.",
+                    );
+                  setProfile(data);
+                  setEditing(false);
+                  toast("Tu nombre se actualizó.");
+                } catch (e) {
+                  toast(e.message, "error");
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              <Field label="¿Cómo quieres que te llamemos?">
+                <input
+                  name="nombre"
+                  defaultValue={profile.nombre}
+                  required
+                  minLength={2}
+                  maxLength={80}
+                  autoFocus
+                  autoComplete="name"
+                />
+              </Field>
+              <div className="button-row">
+                <Button type="submit" disabled={busy}>
+                  Guardar nombre
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setEditing(false)}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <h3>{profile.nombre}</h3>
+              <p>{user.email}</p>
+              <div className="profile-tags">
+                <span className="badge">
+                  {admin
+                    ? "Administradora · Equipo EndoIntegral"
+                    : `Plan ${planNames[profile.plan] || profile.plan}`}
+                </span>
+                <span className="badge">
+                  {profile.activo ? "Acceso activo" : "Acceso inactivo"}
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+        {!editing && (
+          <Button variant="secondary" onClick={() => setEditing(true)}>
+            <Pencil size={15} />
+            Editar nombre
+          </Button>
+        )}
       </div>
       <form
         className="card"

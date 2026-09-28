@@ -14,7 +14,12 @@ import {
 import { supabase, result } from "../../lib/supabase";
 import { useRows } from "../../lib/hooks";
 import { useAuth } from "../../lib/auth";
-import { adminSections, MAX_ADMINS, planNames, roleNames } from "../../lib/plans";
+import {
+  adminSections,
+  MAX_ADMINS,
+  planNames,
+  roleNames,
+} from "../../lib/plans";
 import { uploadFile } from "../../lib/uploads";
 export default function AdminLayout() {
   return (
@@ -54,8 +59,14 @@ export function AdminHome() {
     <>
       <div className="admin-stats">
         {[
-          [m.filter((x) => x.activo && x.rol !== "admin").length, "Usuarias activas"],
-          [m.filter((x) => x.activo && x.rol === "admin").length, "Administradoras"],
+          [
+            m.filter((x) => x.activo && x.rol !== "admin").length,
+            "Usuarias activas",
+          ],
+          [
+            m.filter((x) => x.activo && x.rol === "admin").length,
+            "Administradoras",
+          ],
           [
             c.filter((x) => x.estado === "nuevo").length,
             "Mensajes por responder",
@@ -83,7 +94,8 @@ export function AdminMembers() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false),
     [busy, setBusy] = useState(false),
-    [inviteRole, setInviteRole] = useState("miembra");
+    [inviteRole, setInviteRole] = useState("miembra"),
+    [created, setCreated] = useState(null);
   const toast = useToast();
   const admins = rows.filter((p) => p.rol === "admin" && p.activo).length;
   const full = admins >= MAX_ADMINS;
@@ -131,18 +143,13 @@ export function AdminMembers() {
                   aria-label={`Rol de ${p.nombre}`}
                   value={p.rol}
                   disabled={self}
-                  title={
-                    self ? "No puedes cambiar tu propio rol." : undefined
-                  }
+                  title={self ? "No puedes cambiar tu propio rol." : undefined}
                   onChange={(e) =>
                     update(p, { rol: e.target.value }, "Rol actualizado.")
                   }
                 >
                   <option value="miembra">{roleNames.miembra}</option>
-                  <option
-                    value="admin"
-                    disabled={full && p.rol !== "admin"}
-                  >
+                  <option value="admin" disabled={full && p.rol !== "admin"}>
                     {roleNames.admin}
                   </option>
                 </select>
@@ -182,70 +189,125 @@ export function AdminMembers() {
         })
       )}
       {open && (
-        <Modal title="Invitar una persona" onClose={() => setOpen(false)}>
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              setBusy(true);
-              const f = Object.fromEntries(new FormData(e.currentTarget));
-              try {
-                const { data, error } = await supabase.functions.invoke(
-                  "invite-member",
-                  { body: f },
-                );
-                if (error || data?.error)
-                  throw new Error(
-                    data?.error || "No se pudo enviar la invitación.",
+        <Modal
+          title={created ? "Cuenta creada" : "Invitar una persona"}
+          eyebrow="EQUIPO ENDOINTEGRAL"
+          onClose={() => {
+            setOpen(false);
+            setCreated(null);
+          }}
+        >
+          {created ? (
+            <>
+              <Notice tone="error">
+                La cuenta se creó, pero no pudimos enviar el correo. Comparte
+                estos datos con la persona por un medio privado.
+              </Notice>
+              <div className="credentials">
+                <span>Correo</span>
+                <strong>{created.email}</strong>
+                <span>Contraseña temporal</span>
+                <strong className="credentials-password">
+                  {created.password}
+                </strong>
+              </div>
+              <div className="button-row">
+                <Button
+                  onClick={() => {
+                    navigator.clipboard
+                      ?.writeText(
+                        `Correo: ${created.email}
+Contraseña temporal: ${created.password}
+Ingresa en ${location.origin}/ingresar`,
+                      )
+                      .then(() => toast("Datos copiados."));
+                  }}
+                >
+                  Copiar datos
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setOpen(false);
+                    setCreated(null);
+                  }}
+                >
+                  Listo
+                </Button>
+              </div>
+            </>
+          ) : (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setBusy(true);
+                const f = Object.fromEntries(new FormData(e.currentTarget));
+                try {
+                  const { data, error } = await supabase.functions.invoke(
+                    "invite-member",
+                    { body: f },
                   );
-                setOpen(false);
-                refresh();
-                toast("Invitación enviada.");
-              } catch (e) {
-                toast(e.message, "error");
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            <Field label="Nombre completo">
-              <input name="nombre" required minLength={3} maxLength={80} />
-            </Field>
-            <Field label="Correo electrónico">
-              <input name="email" type="email" required />
-            </Field>
-            <Field label="Rol">
-              <select
-                name="rol"
-                value={inviteRole}
-                onChange={(e) => setInviteRole(e.target.value)}
-              >
-                <option value="miembra">{roleNames.miembra}</option>
-                <option value="admin" disabled={full}>
-                  {roleNames.admin}
-                  {full ? ` (límite de ${MAX_ADMINS} alcanzado)` : ""}
-                </option>
-              </select>
-            </Field>
-            {inviteRole === "miembra" ? (
-              <Field label="Plan">
-                <select name="plan">
-                  {Object.entries(planNames).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
+                  if (error || data?.error)
+                    throw new Error(
+                      data?.error || "No se pudo enviar la invitación.",
+                    );
+                  refresh();
+                  if (data.emailed) {
+                    setOpen(false);
+                    toast(`Invitación enviada a ${f.email}.`);
+                  } else
+                    setCreated({ email: f.email, password: data.password });
+                } catch (e) {
+                  toast(e.message, "error");
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              <Field label="Nombre completo">
+                <input name="nombre" required minLength={3} maxLength={80} />
+              </Field>
+              <Field label="Correo electrónico">
+                <input name="email" type="email" required />
+              </Field>
+              <Field label="Rol">
+                <select
+                  name="rol"
+                  value={inviteRole}
+                  onChange={(e) => setInviteRole(e.target.value)}
+                >
+                  <option value="miembra">{roleNames.miembra}</option>
+                  <option value="admin" disabled={full}>
+                    {roleNames.admin}
+                    {full ? ` (límite de ${MAX_ADMINS} alcanzado)` : ""}
+                  </option>
                 </select>
               </Field>
-            ) : (
-              <Notice>
-                Las administradoras tienen acceso completo a todos los módulos
-                y al panel del equipo.
-              </Notice>
-            )}
-            <Button type="submit" disabled={busy}>
-              {busy ? "Enviando…" : "Enviar invitación"}
-            </Button>
-          </form>
+              {inviteRole === "miembra" ? (
+                <Field label="Plan">
+                  <select name="plan">
+                    {Object.entries(planNames).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              ) : (
+                <Notice>
+                  Las administradoras tienen acceso completo a todos los módulos
+                  y al panel del equipo.
+                </Notice>
+              )}
+              <p style={{ fontSize: 12, margin: "4px 0 16px" }}>
+                Le enviaremos un correo con su contraseña temporal. Al ingresar
+                por primera vez deberá crear una nueva.
+              </p>
+              <Button type="submit" disabled={busy}>
+                {busy ? "Enviando…" : "Enviar invitación"}
+              </Button>
+            </form>
+          )}
         </Modal>
       )}
     </>
