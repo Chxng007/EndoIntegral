@@ -36,7 +36,11 @@ export function Navbar() {
   const { user, profile } = useAuth();
   const { pathname } = useLocation();
   // Con sesión iniciada: «Mi espacio» en el menú y el nombre de la persona lleva a su cuenta.
-  const accountLabel = user ? firstName(profile) || "Mi cuenta" : "Mi cuenta";
+  const accountLabel = user
+    ? firstName(profile) ||
+      firstName({ nombre: user.user_metadata?.nombre }) ||
+      "Mi cuenta"
+    : "Mi cuenta";
   const accountTo = user ? "/app/cuenta" : "/ingresar";
   useEffect(() => {
     setOpen(false);

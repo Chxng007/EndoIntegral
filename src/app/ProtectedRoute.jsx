@@ -99,7 +99,8 @@ export default function ProtectedRoute({ admin = false }) {
     useAuth();
   const [busy, setBusy] = useState(false),
     [failure, setFailure] = useState("");
-  if (loading) return <Loading />;
+  // Mientras llega el perfil se muestra la carga, nunca el aviso de membresía inactiva.
+  if (loading || (user && !profile && !error)) return <Loading />;
   if (!user) return <Navigate to="/ingresar" replace />;
   if (error || !profile?.activo)
     return (

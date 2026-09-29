@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { supabase } from "./supabase";
@@ -13,34 +14,47 @@ export function AuthProvider({ children }) {
   const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(Boolean(supabase));
   const [error, setError] = useState("");
-  const load = useCallback(async (session) => {
-    setUser(session?.user ?? null);
-    setProfile(null);
-    setConsent(false);
+  // Id de la persona cuyo perfil ya está cargado (o cargándose) y número de la última petición.
+  // Evita volver a pedir el perfil —y mostrar «membresía no activa» mientras llega— cuando
+  // Supabase repite el evento de sesión al recargar o refresca el token.
+  const loadedFor = useRef(null);
+  const request = useRef(0);
+  const load = useCallback(async (session, force = false) => {
+    const uid = session?.user?.id ?? null;
+    if (!uid) {
+      loadedFor.current = null;
+      request.current++;
+      setUser(null);
+      setProfile(null);
+      setConsent(false);
+      setError("");
+      setLoading(false);
+      return;
+    }
+    setUser(session.user);
+    if (uid === loadedFor.current && !force) return;
+    loadedFor.current = uid;
+    const id = ++request.current;
+    setLoading(true);
     setError("");
-    if (session?.user) {
-      const [p, c] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single(),
-        supabase
-          .from("consents")
-          .select("id")
-          .eq("user_id", session.user.id)
-          .eq("tipo", "datos_sensibles")
-          .eq("version", "1.0")
-          .limit(1),
-      ]);
-      if (p.error || c.error)
-        setError(
-          "No pudimos cargar tu membresía. Intenta ingresar nuevamente.",
-        );
-      else {
-        setProfile(p.data);
-        setConsent(Boolean(c.data?.length));
-      }
+    const [p, c] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", uid).single(),
+      supabase
+        .from("consents")
+        .select("id")
+        .eq("user_id", uid)
+        .eq("tipo", "datos_sensibles")
+        .eq("version", "1.0")
+        .limit(1),
+    ]);
+    if (id !== request.current) return;
+    if (p.error || c.error) {
+      loadedFor.current = null;
+      setProfile(null);
+      setError("No pudimos cargar tu membresía. Intenta ingresar nuevamente.");
+    } else {
+      setProfile(p.data);
+      setConsent(Boolean(c.data?.length));
     }
     setLoading(false);
   }, []);
@@ -67,6 +81,8 @@ export function AuthProvider({ children }) {
   }, [load]);
   async function signOut() {
     await supabase?.auth.signOut();
+    loadedFor.current = null;
+    request.current++;
     setUser(null);
     setProfile(null);
     setConsent(false);
