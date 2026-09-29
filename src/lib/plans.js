@@ -18,7 +18,7 @@ export const plansWith = (moduleId) => Object.keys(planModules).filter(p => plan
 
 // Roles: el equipo (hasta MAX_ADMINS personas) comparte las mismas funciones;
 // las usuarias ven solo los módulos de su plan. El límite también se valida en la base de datos.
-export const MAX_ADMINS = 5;
+export const MAX_ADMINS = 6;
 export const roleNames = { admin: 'Administradora', miembra: 'Usuaria' };
 export const isAdmin = (profile) => Boolean(profile?.activo && profile.rol === 'admin');
 export const firstName = (profile) => profile?.nombre?.trim().split(/\s+/)[0] || '';

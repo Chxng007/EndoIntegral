@@ -22,7 +22,7 @@ Deno.serve(async(req)=>{const response=preflight(req);if(response)return respons
  const {db}=await authenticated(req,true);const parsed=schema.safeParse(await req.json());
  if(!parsed.success)return json(req,{error:'Revisa los datos de la invitación.'},400);
  const {nombre,email,plan,rol}=parsed.data;
- if(rol==='admin'){const {count}=await db.from('profiles').select('id',{count:'exact',head:true}).eq('rol','admin').eq('activo',true);if((count??0)>=5)return json(req,{error:'Ya hay 5 administradoras activas.'},400);}
+ if(rol==='admin'){const {count}=await db.from('profiles').select('id',{count:'exact',head:true}).eq('rol','admin').eq('activo',true);if((count??0)>=6)return json(req,{error:'Ya hay 6 administradoras activas.'},400);}
  const password=temporaryPassword();
  const {data,error}=await db.auth.admin.createUser({email,password,email_confirm:true,user_metadata:{nombre}});
  if(error||!data.user)return json(req,{error:/already|registered|exists/i.test(error?.message||'')?'Ya existe una cuenta con ese correo.':'No se pudo crear la cuenta.'},400);
