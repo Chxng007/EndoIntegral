@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../lib/auth";
 import { firstName } from "../../lib/plans";
-import { Button } from "../ui";
+import { Button, Loading } from "../ui";
 export function Brand() {
   return (
     <Link className="brand" to="/" aria-label="EndoIntegral, inicio">
@@ -200,7 +200,10 @@ export default function Layout() {
       </a>
       <Navbar />
       <main id="main" tabIndex={-1}>
-        <Outlet />
+        {/* La carga de cada página ocurre aquí dentro: navbar y footer no desaparecen. */}
+        <Suspense fallback={<Loading />}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
     </>

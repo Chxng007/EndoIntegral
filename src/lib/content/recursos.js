@@ -1,12 +1,75 @@
 export const poses = [
- {name:'Postura del niño',sanskrit:'Balasana',text:'Un momento de descanso y conexión con la espalda y la cadera.',time:'1–3 min',seconds:120},
- {name:'Gato – Vaca',sanskrit:'Marjaryasana – Bitilasana',text:'Movimiento suave de la columna acompañado por tu respiración.',time:'1–2 min',seconds:90},
- {name:'Perro boca abajo',sanskrit:'Adho Mukha Svanasana',text:'Una invitación a estirar la espalda, adaptando la postura a tu comodidad.',time:'1–2 min',seconds:90},
- {name:'Postura de la mariposa',sanskrit:'Baddha Konasana',text:'Apertura suave de caderas. Puedes utilizar apoyos bajo las rodillas.',time:'2–3 min',seconds:150},
- {name:'Postura de la cobra',sanskrit:'Bhujangasana',text:'Extensión suave de espalda, sin forzar el abdomen ni la zona lumbar.',time:'30 s – 1 min',seconds:45},
- {name:'Ángulo lateral extendido',sanskrit:'Utthita Parsvakonasana',text:'Explora el estiramiento lateral dentro de un rango cómodo.',time:'1–2 min por lado',seconds:180},
- {name:'Piernas arriba en la pared',sanskrit:'Viparita Karani',text:'Una pausa de descanso con las piernas apoyadas en la pared.',time:'3–5 min',seconds:240},
- {name:'Relajación final',sanskrit:'Savasana',text:'Descansa y observa las sensaciones de tu cuerpo sin exigencias.',time:'5 min',seconds:300},
+  {
+    name: "Postura del niño",
+    sanskrit: "Balasana",
+    text: "Un momento de descanso y conexión con la espalda y la cadera.",
+    time: "1–3 min",
+    seconds: 120,
+  },
+  {
+    name: "Gato – Vaca",
+    sanskrit: "Marjaryasana – Bitilasana",
+    text: "Movimiento suave de la columna acompañado por tu respiración.",
+    time: "1–2 min",
+    seconds: 90,
+  },
+  {
+    name: "Perro boca abajo",
+    sanskrit: "Adho Mukha Svanasana",
+    text: "Una invitación a estirar la espalda, adaptando la postura a tu comodidad.",
+    time: "1–2 min",
+    seconds: 90,
+  },
+  {
+    name: "Postura de la mariposa",
+    sanskrit: "Baddha Konasana",
+    text: "Apertura suave de caderas. Puedes utilizar apoyos bajo las rodillas.",
+    time: "2–3 min",
+    seconds: 150,
+  },
+  {
+    name: "Postura de la cobra",
+    sanskrit: "Bhujangasana",
+    text: "Extensión suave de espalda, sin forzar el abdomen ni la zona lumbar.",
+    time: "30 s – 1 min",
+    seconds: 45,
+  },
+  {
+    name: "Ángulo lateral extendido",
+    sanskrit: "Utthita Parsvakonasana",
+    text: "Explora el estiramiento lateral dentro de un rango cómodo.",
+    time: "1–2 min por lado",
+    seconds: 180,
+  },
+  {
+    name: "Piernas arriba en la pared",
+    sanskrit: "Viparita Karani",
+    text: "Una pausa de descanso con las piernas apoyadas en la pared.",
+    time: "3–5 min",
+    seconds: 240,
+  },
+  {
+    name: "Relajación final",
+    sanskrit: "Savasana",
+    text: "Descansa y observa las sensaciones de tu cuerpo sin exigencias.",
+    time: "5 min",
+    seconds: 300,
+  },
 ];
-export const moods = ['Bien','Regular','Bajo','Irritable','Ansiosa','Agotada'];
-export const symptomOptions = ['Dolor menstrual','Náuseas','Fatiga','Digestivo','Sangrado','Niebla mental','Insomnio'];
+export const moods = [
+  "Bien",
+  "Regular",
+  "Bajo",
+  "Irritable",
+  "Ansiosa",
+  "Agotada",
+];
+export const symptomOptions = [
+  "Dolor menstrual",
+  "Náuseas",
+  "Fatiga",
+  "Digestivo",
+  "Sangrado",
+  "Niebla mental",
+  "Insomnio",
+];

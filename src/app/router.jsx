@@ -89,24 +89,27 @@ export default function Router() {
           <Route element={<ProtectedRoute admin />}>
             <Route path="admin" element={<MemberLayout />}>
               <Route element={<AdminLayout />}>
-              <Route index element={<AdminHome />} />
-              <Route path="miembras" element={<AdminMembers />} />
-              <Route path="mensajes" element={<AdminInbox />} />
-              <Route path="solicitudes" element={<AdminInbox appointments />} />
-              <Route
-                path="podcasts"
-                element={<AdminContent kind="podcasts" />}
-              />
-              <Route
-                path="profesionales"
-                element={<AdminContent kind="profesionales" />}
-              />
-              <Route
-                path="recursos"
-                element={<AdminContent kind="recursos" />}
-              />
-              <Route path="videos" element={<AdminContent kind="videos" />} />
-              <Route path="foro" element={<AdminForum />} />
+                <Route index element={<AdminHome />} />
+                <Route path="miembras" element={<AdminMembers />} />
+                <Route path="mensajes" element={<AdminInbox />} />
+                <Route
+                  path="solicitudes"
+                  element={<AdminInbox appointments />}
+                />
+                <Route
+                  path="podcasts"
+                  element={<AdminContent kind="podcasts" />}
+                />
+                <Route
+                  path="profesionales"
+                  element={<AdminContent kind="profesionales" />}
+                />
+                <Route
+                  path="recursos"
+                  element={<AdminContent kind="recursos" />}
+                />
+                <Route path="videos" element={<AdminContent kind="videos" />} />
+                <Route path="foro" element={<AdminForum />} />
               </Route>
             </Route>
           </Route>

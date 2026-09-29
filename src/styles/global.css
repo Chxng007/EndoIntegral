@@ -117,6 +117,23 @@ ul {
     outline: none
 }
 
+/* El footer siempre queda al fondo de la pantalla, aunque la página esté cargando. */
+#root {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column
+}
+
+#main {
+    flex: 1 0 auto
+}
+
+#main>.loading {
+    min-height: calc(100vh - 110px);
+    min-height: calc(100dvh - 110px)
+}
+
 .container {
     width: min(1220px, calc(100% - 96px));
     margin-inline: auto
@@ -3327,23 +3344,43 @@ select[aria-invalid=true] {
         position: static;
         flex-direction: row;
         overflow-x: auto;
-        gap: 5px;
-        scrollbar-width: none
+        gap: 8px;
+        padding-inline: 2px;
+        scrollbar-width: none;
+        scroll-behavior: smooth;
+        -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent);
+        mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent)
     }
 
+    .member-sidebar nav::-webkit-scrollbar {
+        display: none
+    }
+
+    /* En el celular cada sección es una píldora con icono y nombre que se desliza de lado. */
     .member-sidebar nav a,
     .member-sidebar nav>button {
-        padding: 8px 10px;
-        gap: 6px;
-        font-size: 10px;
+        flex: none;
+        flex-direction: row;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 14px;
+        font-size: 12px;
+        line-height: 1.2;
         white-space: nowrap;
-        flex-direction: column;
-        min-width: 66px
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: #fffdfb
     }
 
-    .member-sidebar nav a svg {
-        width: 17px;
-        height: 17px
+    .member-sidebar nav a.active {
+        border-color: #d9c2e4
+    }
+
+    .member-sidebar nav a svg,
+    .member-sidebar nav>button svg {
+        flex: none;
+        width: 16px;
+        height: 16px
     }
 
     .member-content {

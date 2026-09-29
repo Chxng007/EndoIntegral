@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   CalendarCheck,
@@ -27,7 +27,7 @@ import {
   plansWith,
 } from "../../lib/plans";
 import Icon from "../ui/Icon";
-import { Badge, Button, EmptyState, Modal } from "../ui";
+import { Badge, Button, EmptyState, Loading, Modal } from "../ui";
 import { PodcastProvider, PersistentPlayer } from "../video/PodcastPlayer";
 export function UrgentHelp({ onClose }) {
   return (
@@ -100,11 +100,24 @@ const adminIcons = {
 };
 function SidebarNav({ profile, signOut }) {
   const admin = isAdmin(profile);
+  const ref = useRef(null);
+  const { pathname } = useLocation();
+  // En el celular la barra se desliza de lado: centra la sección activa para que siempre se vea.
+  useEffect(() => {
+    const nav = ref.current,
+      active = nav?.querySelector("a.active");
+    if (!nav || !active || nav.scrollWidth <= nav.clientWidth) return;
+    const n = nav.getBoundingClientRect(),
+      a = active.getBoundingClientRect();
+    nav.scrollTo({
+      left: nav.scrollLeft + a.left - n.left - (n.width - a.width) / 2,
+    });
+  }, [pathname]);
   // Las usuarias solo ven los módulos de su plan; el equipo los ve todos.
   const modules = content.modules.filter((m) => canAccess(profile, m.id));
   const hidden = content.modules.length - modules.length;
   return (
-    <nav aria-label="Tu espacio privado">
+    <nav aria-label="Tu espacio privado" ref={ref}>
       {admin && <p className="nav-group-label">Mi espacio</p>}
       <NavLink to="/app" end>
         <Home size={17} />
@@ -182,7 +195,9 @@ export default function MemberLayout() {
           {locked ? (
             <PlanLocked module={current} profile={profile} />
           ) : (
-            <Outlet />
+            <Suspense fallback={<Loading />}>
+              <Outlet />
+            </Suspense>
           )}
           <PersistentPlayer />
         </div>
