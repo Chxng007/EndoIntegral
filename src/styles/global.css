@@ -1666,7 +1666,9 @@ select[aria-invalid=true] {
 .password-wrap button {
     position: absolute;
     right: 6px;
-    top: 5px
+    top: 5px;
+    z-index: 2;
+    touch-action: manipulation
 }
 
 .login-card .button-primary {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 import { Button, Field, Notice } from "../../components/ui";
@@ -13,21 +13,49 @@ export default function Ingresar() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const update = params.get("modo") === "contrasena";
+  // «checking» mientras se valida el enlace del correo; «ready» cuando ya hay sesión para cambiarla.
+  const [link, setLink] = useState(update ? "checking" : "none");
   useEffect(() => {
     if (user && !update) navigate("/app", { replace: true });
   }, [user, update, navigate]);
+  const verified = useRef(false);
   useEffect(() => {
-    if (!supabase || !update) return;
-    const code = params.get("code");
-    if (code)
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        if (error)
-          setStatus({
-            error: true,
-            text: "El enlace ya no es válido. Solicita uno nuevo al equipo.",
-          });
+    if (!supabase || !update || verified.current) return;
+    verified.current = true; // el token solo se puede canjear una vez
+    const tokenHash = params.get("token_hash"),
+      code = params.get("code");
+    const invalid = () => {
+      setLink("invalid");
+      setStatus({
+        error: true,
+        text: "Este enlace ya se usó o caducó. Pide uno nuevo con «¿Olvidaste tu contraseña?».",
       });
-  }, [params, update]);
+    };
+    // Enlace del correo de EndoIntegral: funciona en cualquier navegador.
+    if (tokenHash)
+      supabase.auth
+        .verifyOtp({ token_hash: tokenHash, type: "recovery" })
+        .then(({ error }) => {
+          if (error) invalid();
+          else {
+            setLink("ready");
+            // Evita reutilizar el token si se recarga la página.
+            navigate("/ingresar?modo=contrasena", { replace: true });
+          }
+        });
+    // Enlaces antiguos de Supabase (solo sirven en el mismo navegador donde se pidieron).
+    else if (code)
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (error) invalid();
+        else setLink("ready");
+      });
+    else
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session) setLink("ready");
+        else if (link === "checking") invalid();
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [update]);
   async function submit(e) {
     e.preventDefault();
     setStatus(null);
@@ -43,16 +71,32 @@ export default function Ingresar() {
         if (password !== values.get("confirm"))
           throw new Error("Las contraseñas no coinciden.");
         const { error } = await supabase.auth.updateUser({ password });
-        if (error) throw error;
+        if (error)
+          throw new Error(
+            /session/i.test(error.message)
+              ? "Tu enlace caducó. Pide uno nuevo con «¿Olvidaste tu contraseña?»."
+              : /different|same/i.test(error.message)
+                ? "La nueva contraseña debe ser distinta a la anterior."
+                : "No pudimos guardar tu contraseña. Intenta con otra.",
+          );
+        // Si venía de una invitación, ya no hace falta pedirle que la cambie.
+        await supabase.rpc("mark_password_changed");
         navigate("/app", { replace: true });
       } else if (mode === "reset") {
-        const { error } = await supabase.auth.resetPasswordForEmail(
-          values.get("email"),
-          { redirectTo: `${window.location.origin}/ingresar?modo=contrasena` },
+        const { data, error } = await supabase.functions.invoke(
+          "reset-password",
+          { body: { email: values.get("email") } },
         );
-        if (error) throw error;
+        if (error || data?.error) {
+          const detail = await error?.context?.json?.().catch(() => null);
+          throw new Error(
+            data?.error ||
+              detail?.error ||
+              "No pudimos enviar el enlace. Intenta nuevamente.",
+          );
+        }
         setStatus({
-          text: "Si el correo está registrado, recibirás un enlace para cambiar tu contraseña.",
+          text: "Si el correo está registrado, te enviamos un enlace para crear una contraseña nueva. Revisa también Spam.",
         });
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -122,7 +166,10 @@ export default function Ingresar() {
                   <button
                     type="button"
                     className="icon-button"
-                    onClick={() => setShow(!show)}
+                    // Evita que el campo pierda el foco (en iPhone eso cancelaba el cambio).
+                    onPointerDown={(e) => e.preventDefault()}
+                    onClick={() => setShow((s) => !s)}
+                    aria-pressed={show}
                     aria-label={
                       show ? "Ocultar contraseña" : "Mostrar contraseña"
                     }
@@ -135,7 +182,7 @@ export default function Ingresar() {
                 <Field label="Confirma la contraseña">
                   <input
                     name="confirm"
-                    type="password"
+                    type={show ? "text" : "password"}
                     required
                     minLength={10}
                     autoComplete="new-password"
@@ -144,7 +191,13 @@ export default function Ingresar() {
               )}
             </>
           )}
-          <Button disabled={busy} type="submit">
+          {update && link === "checking" && (
+            <Notice>Verificando tu enlace…</Notice>
+          )}
+          <Button
+            disabled={busy || (update && link !== "ready")}
+            type="submit"
+          >
             <LockKeyhole size={15} />
             {busy
               ? "Un momento…"
@@ -155,6 +208,18 @@ export default function Ingresar() {
                   : "Iniciar sesión"}
           </Button>
         </form>
+        {update && link === "invalid" && (
+          <button
+            className="forgot"
+            onClick={() => {
+              setMode("reset");
+              setStatus(null);
+              navigate("/ingresar", { replace: true });
+            }}
+          >
+            Pedir un enlace nuevo
+          </button>
+        )}
         {!update && (
           <button
             className="forgot"
