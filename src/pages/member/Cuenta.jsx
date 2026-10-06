@@ -4,7 +4,7 @@ import { MemberTitle } from "../../components/layout/MemberLayout";
 import { Button, Field, Modal, Notice, useToast } from "../../components/ui";
 import { useAuth } from "../../lib/auth";
 import { result, supabase } from "../../lib/supabase";
-import { isAdmin, planNames } from "../../lib/plans";
+import { isAdmin, planLabels } from "../../lib/plans";
 export default function Cuenta() {
   const { profile, setProfile, user, signOut } = useAuth();
   const [remove, setRemove] = useState(false),
@@ -129,7 +129,7 @@ export default function Cuenta() {
                 <span className="badge">
                   {admin
                     ? "Administradora · Equipo EndoIntegral"
-                    : `Plan ${planNames[profile.plan] || profile.plan}`}
+                    : planLabels[profile.plan] || profile.plan}
                 </span>
                 <span className="badge">
                   {profile.activo ? "Acceso activo" : "Acceso inactivo"}

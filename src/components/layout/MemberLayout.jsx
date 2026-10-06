@@ -23,7 +23,8 @@ import {
   canAccess,
   firstName,
   isAdmin,
-  planNames,
+  hasPlan,
+  planLabels,
   plansWith,
 } from "../../lib/plans";
 import Icon from "../ui/Icon";
@@ -74,14 +75,18 @@ function PlanLocked({ module, profile }) {
       />
       <EmptyState
         icon={LockKeyhole}
-        title={`Este espacio no está incluido en el plan ${planNames[profile.plan] || profile.plan}`}
+        title={
+          hasPlan(profile)
+            ? `Este espacio no está incluido en tu ${planLabels[profile.plan]}`
+            : "Este espacio se activa con un plan"
+        }
       >
-        Está disponible en el plan {plansWith(module.id).join(" y ")}. Si
-        quieres ampliar tu acompañamiento, escríbenos y te orientamos.
+        Está disponible en {plansWith(module.id).join(" y ")}. Solicita tu plan
+        y, cuando el equipo confirme tu inscripción, se activará en tu cuenta.
       </EmptyState>
       <div className="center" style={{ marginTop: 25 }}>
-        <Button to="/contacto?asunto=general" arrow>
-          Hablar con el equipo
+        <Button to="/programa#planes" arrow>
+          Ver los planes
         </Button>
       </div>
     </>
@@ -155,7 +160,7 @@ function SidebarNav({ profile, signOut }) {
       {hidden > 0 && (
         <NavLink to="/programa#planes" className="nav-upgrade">
           <Sparkles size={17} />
-          Ampliar mi plan
+          {hasPlan(profile) ? "Ampliar mi plan" : "Elegir mi plan"}
         </NavLink>
       )}
       <button onClick={signOut}>
@@ -186,7 +191,7 @@ export default function MemberLayout() {
             <p>
               {admin
                 ? "Administradora · Equipo EndoIntegral"
-                : `Plan ${planNames[profile?.plan] || "EndoIntegral"}`}
+                : planLabels[profile?.plan] || "EndoIntegral"}
             </p>
           </div>
           <SidebarNav profile={profile} signOut={signOut} />

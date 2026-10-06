@@ -38,7 +38,7 @@ export default function Acompanamiento() {
           motivo: values.motivo,
         }),
       );
-      toast("Solicitud recibida. El equipo te contactará para coordinar.");
+      toast("Solicitud enviada al equipo. Te contactaremos para coordinar tu sesión.");
       el.reset();
       setPreferred("");
       refresh();
@@ -194,8 +194,9 @@ export default function Acompanamiento() {
           </Field>
         </div>
         <Notice>
-          Esta es una solicitud de contacto. La sesión queda agendada cuando el
-          equipo confirme fecha, modalidad y condiciones contigo.
+          Tu solicitud llega directamente al correo del equipo EndoIntegral. La
+          sesión queda agendada cuando te contactemos y confirmemos fecha,
+          modalidad y condiciones contigo.
         </Notice>
         <Button type="submit" disabled={busy}>
           <Send size={15} />

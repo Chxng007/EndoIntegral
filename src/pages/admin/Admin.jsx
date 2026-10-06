@@ -17,7 +17,7 @@ import { useAuth } from "../../lib/auth";
 import {
   adminSections,
   MAX_ADMINS,
-  planNames,
+  planLabels,
   roleNames,
 } from "../../lib/plans";
 import { uploadFile } from "../../lib/uploads";
@@ -95,9 +95,43 @@ export function AdminMembers() {
   const [open, setOpen] = useState(false),
     [busy, setBusy] = useState(false),
     [inviteRole, setInviteRole] = useState("miembra"),
-    [created, setCreated] = useState(null);
+    [created, setCreated] = useState(null),
+    [query, setQuery] = useState(""),
+    [filter, setFilter] = useState("todas");
   const toast = useToast();
   const admins = rows.filter((p) => p.rol === "admin" && p.activo).length;
+  const waiting = rows.filter((p) => p.rol !== "admin" && p.plan === "ninguno").length;
+  const term = query.trim().toLowerCase();
+  const visible = rows.filter(
+    (p) =>
+      (!term ||
+        p.nombre?.toLowerCase().includes(term) ||
+        p.email?.toLowerCase().includes(term)) &&
+      (filter === "todas" ||
+        (filter === "sin-plan" && p.rol !== "admin" && p.plan === "ninguno") ||
+        (filter === "equipo" && p.rol === "admin")),
+  );
+  // Al activar o cambiar un plan pagado se le avisa a la usuaria por correo.
+  async function changePlan(p, plan) {
+    try {
+      await result(supabase.from("profiles").update({ plan }).eq("id", p.id));
+      refresh();
+      if (plan === "ninguno") {
+        toast("La cuenta quedó sin plan.");
+        return;
+      }
+      const { data } = await supabase.functions.invoke("notify-plan", {
+        body: { user_id: p.id },
+      });
+      toast(
+        data?.emailed
+          ? `${planLabels[plan]} activado. Le avisamos a ${p.email || p.nombre} por correo.`
+          : `${planLabels[plan]} activado.`,
+      );
+    } catch (e) {
+      toast(e.message, "error");
+    }
+  }
   const full = admins >= MAX_ADMINS;
   async function update(p, changes, message) {
     try {
@@ -114,7 +148,8 @@ export function AdminMembers() {
         <div>
           <h2>Usuarias y equipo</h2>
           <p style={{ fontSize: 12 }}>
-            Administradoras activas: {admins} de {MAX_ADMINS}
+            Administradoras activas: {admins} de {MAX_ADMINS} · Cuentas sin
+            plan: {waiting}
           </p>
         </div>
         <Button onClick={() => setOpen(true)}>
@@ -122,6 +157,29 @@ export function AdminMembers() {
           Invitar persona
         </Button>
       </div>
+      <div className="admin-filters">
+        <input
+          type="search"
+          placeholder="Buscar por nombre o correo…"
+          aria-label="Buscar por nombre o correo"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <select
+          aria-label="Filtrar cuentas"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        >
+          <option value="todas">Todas las cuentas</option>
+          <option value="sin-plan">Sin plan (por activar)</option>
+          <option value="equipo">Equipo</option>
+        </select>
+      </div>
+      <Notice>
+        Cuando alguien pague su plan, búscala por el correo que dejó en la
+        solicitud y elige su plan aquí: se activa al instante y le avisamos por
+        correo. Si aún no tiene cuenta, usa «Invitar persona».
+      </Notice>
       {error && <Notice tone="error">{error}</Notice>}
       {loading ? (
         <Loading />
@@ -130,7 +188,7 @@ export function AdminMembers() {
           Envía una invitación al confirmar una inscripción.
         </EmptyState>
       ) : (
-        rows.map((p) => {
+        visible.map((p) => {
           const self = p.id === user?.id;
           return (
             <article key={p.id} className="admin-record">
@@ -138,6 +196,7 @@ export function AdminMembers() {
                 {p.nombre}
                 {self && " (tú)"}
               </h3>
+              {p.email && <p className="admin-email">{p.email}</p>}
               <div className="button-row">
                 <select
                   aria-label={`Rol de ${p.nombre}`}
@@ -157,13 +216,11 @@ export function AdminMembers() {
                   <select
                     aria-label={`Plan de ${p.nombre}`}
                     value={p.plan}
-                    onChange={(e) =>
-                      update(p, { plan: e.target.value }, "Plan actualizado.")
-                    }
+                    onChange={(e) => changePlan(p, e.target.value)}
                   >
-                    {Object.entries(planNames).map(([value, label]) => (
+                    {Object.entries(planLabels).map(([value, label]) => (
                       <option key={value} value={value}>
-                        Plan {label}
+                        {value === "ninguno" ? "Sin plan (gratuita)" : label}
                       </option>
                     ))}
                   </select>
@@ -181,7 +238,7 @@ export function AdminMembers() {
                 <span className="badge">
                   {p.rol === "admin"
                     ? "Equipo · acceso completo"
-                    : `${roleNames[p.rol] || p.rol} · ${planNames[p.plan] || p.plan}`}
+                    : `${roleNames[p.rol] || p.rol} · ${planLabels[p.plan] || p.plan}`}
                 </span>
               </div>
             </article>
@@ -285,10 +342,10 @@ Ingresa en ${location.origin}/ingresar`,
               </Field>
               {inviteRole === "miembra" ? (
                 <Field label="Plan">
-                  <select name="plan">
-                    {Object.entries(planNames).map(([value, label]) => (
+                  <select name="plan" defaultValue="aprende">
+                    {Object.entries(planLabels).map(([value, label]) => (
                       <option key={value} value={value}>
-                        {label}
+                        {value === "ninguno" ? "Sin plan (gratuita)" : label}
                       </option>
                     ))}
                   </select>
@@ -313,9 +370,24 @@ Ingresa en ${location.origin}/ingresar`,
     </>
   );
 }
+const subjectLabels = {
+  general: "Información general",
+  "plan-aprende": "Solicitud de plan · Plan 1 Aprende",
+  "plan-orienta": "Solicitud de plan · Plan 2 Orienta",
+  "plan-diagnostico": "Solicitud de plan · Plan 3 Diagnosticadas",
+  acompanamiento: "Acompañamiento emocional",
+  otro: "Otro",
+};
+// Celular colombiano de 10 dígitos → enlace de WhatsApp con el indicativo 57.
+const whatsappLink = (phone) => {
+  const digits = String(phone).replace(/\D/g, "");
+  return `https://wa.me/${digits.length === 10 ? "57" + digits : digits}`;
+};
 export function AdminInbox({ appointments = false }) {
   const table = appointments ? "appointment_requests" : "contact_messages";
-  const { rows, loading, error, refresh } = useRows(table);
+  const { rows, loading, error, refresh } = useRows(table, {
+    select: appointments ? "*, profiles(nombre,email)" : "*",
+  });
   const toast = useToast();
   return (
     <>
@@ -336,15 +408,35 @@ export function AdminInbox({ appointments = false }) {
           <article className="admin-record" key={r.id}>
             <h3>
               {r.nombre ||
+                r.profiles?.nombre ||
                 `Solicitud · ${new Date(r.created_at).toLocaleDateString("es-CO")}`}
             </h3>
-            {r.email && (
-              <a href={`mailto:${r.email}`} className="text-link">
-                {r.email}
+            {(r.email || r.profiles?.email) && (
+              <a
+                href={`mailto:${r.email || r.profiles.email}`}
+                className="text-link"
+              >
+                {r.email || r.profiles.email}
               </a>
             )}
-            <p>{r.asunto || `${r.modalidad} · ${r.horario}`}</p>
-            <p>{r.telefono}</p>
+            <p>
+              {r.asunto
+                ? subjectLabels[r.asunto] || r.asunto
+                : `${r.modalidad} · ${r.horario}`}
+            </p>
+            {r.telefono && (
+              <p>
+                {r.telefono} ·{" "}
+                <a
+                  className="text-link"
+                  href={whatsappLink(r.telefono)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Escribir por WhatsApp
+                </a>
+              </p>
+            )}
             <p style={{ margin: "14px 0" }}>{r.mensaje || r.motivo}</p>
             <select
               aria-label="Estado de la solicitud"

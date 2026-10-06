@@ -91,49 +91,51 @@ export default function Programa() {
             eyebrow="ENCUENTRA TU CAMINO"
             title="Un plan para tu"
             accent="momento de vida."
-            description="Conoce cada propuesta y conversemos sobre lo que necesitas. El equipo te orientará sobre disponibilidad e inscripción."
+            description="Tres planes que comparten un mismo núcleo: atención clínica, salud mental, psicoeducación, regulación emocional y autocuidado. Cambian la intensidad, la personalización y la duración según tu momento."
           />
           <Plans full />
           <div
             className="table-wrap"
             tabIndex={0}
             role="region"
-            aria-label="Comparación de los planes"
+            aria-label="Resumen de los tres planes"
           >
             <table className="comparison">
               <caption className="sr-only">
-                Comparación de los planes EndoIntegral
+                Resumen de los planes EndoIntegral
               </caption>
               <thead>
                 <tr>
-                  <th>Tu acompañamiento</th>
-                  <th>Diagnóstico</th>
-                  <th>Orienta</th>
-                  <th>Aprende</th>
+                  <th>Resumen</th>
+                  {content.plans.map((p) => (
+                    <th key={p.id}>
+                      Plan {p.number} · {p.name}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {[
-                  ["Duración", "10 semanas", "8 semanas", "6 semanas"],
                   [
-                    "Para quién",
-                    "Diagnóstico confirmado",
-                    "Síntomas o sospecha",
-                    "Personas interesadas",
+                    "Población principal",
+                    "Mujeres y comunidad interesada en conocer sobre endometriosis",
+                    "Mujeres con síntomas o sospecha sin diagnóstico confirmado",
+                    "Mujeres con diagnóstico confirmado de endometriosis",
                   ],
                   [
-                    "Tamizaje psicológico",
-                    "Inicial y final",
-                    "Inicial",
-                    "No incluido",
+                    "Propósito central",
+                    "Psicoeducar, sensibilizar, promover autocuidado y orientar",
+                    "Detectar, evaluar, diagnosticar y orientar la ruta clínica e interdisciplinaria",
+                    "Acompañar el tratamiento y priorizar el bienestar psicológico y la calidad de vida",
                   ],
-                  ["Cartilla", "Física y digital", "Digital", "Digital"],
-                  ["Grupo de apoyo", "Sí", "Sí", "No incluido"],
+                  ["Eje predominante", ...content.plans.map((p) => p.lead)],
                   [
-                    "Encuentro familiar",
-                    "Sí",
-                    "Redes de apoyo",
-                    "Sensibilización",
+                    "Duración",
+                    ...content.plans.map((p) => `${p.weeks} semanas`),
+                  ],
+                  [
+                    "Aporte",
+                    ...content.plans.map((p) => `${p.price} ${p.priceNote}`),
                   ],
                 ].map((row) => (
                   <tr key={row[0]}>
@@ -145,9 +147,43 @@ export default function Programa() {
               </tbody>
             </table>
           </div>
+          <SectionTitle
+            eyebrow="CÓMO ADQUIRIR TU PLAN"
+            title="Cuatro pasos para"
+            accent="empezar."
+          />
+          <ol className="acquire-steps">
+            <li>
+              <strong>Crea tu cuenta gratis</strong>
+              Regístrate en «Mi cuenta». Así conoces tu espacio aunque todavía
+              no tengas un plan.
+            </li>
+            <li>
+              <strong>Solicita tu plan</strong>
+              Elige el plan y envía la solicitud con tu celular. Llega
+              directamente al equipo.
+            </li>
+            <li>
+              <strong>Te escribimos</strong>
+              Una persona del equipo te contacta para resolver tus dudas y
+              coordinar el pago.
+            </li>
+            <li>
+              <strong>Activamos tu plan</strong>
+              Con el pago confirmado activamos tu plan en tu misma cuenta y te
+              avisamos por correo.
+            </li>
+          </ol>
+          <div className="center" style={{ marginBottom: 30 }}>
+            <Button to="/ingresar?modo=registro" variant="secondary" arrow>
+              Crear mi cuenta gratis
+            </Button>
+          </div>
           <Notice>
-            Los programas acompañan tu bienestar y no establecen diagnósticos
-            médicos. La inscripción se coordina directamente con el equipo.
+            Los programas acompañan tu bienestar y se coordinan con el equipo
+            interdisciplinario. Las ayudas diagnósticas externas (ecografías,
+            mapeos, resonancias) se gestionan con tu EPS o la red aliada y no
+            están incluidas en el aporte.
           </Notice>
         </div>
       </section>

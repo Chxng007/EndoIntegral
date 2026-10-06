@@ -9,6 +9,10 @@ verify_jwt = false
 verify_jwt = false
 [functions.reset-password]
 verify_jwt = false
+[functions.register]
+verify_jwt = false
+[functions.notify-plan]
+verify_jwt = false
 [functions.delete-account]
 verify_jwt = false
 [functions.notify-team]

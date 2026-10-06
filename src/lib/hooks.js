@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "./supabase";
 export function useRows(
   table,
-  { order = "created_at", ascending = false } = {},
+  { order = "created_at", ascending = false, select = "*" } = {},
 ) {
   const [rows, setRows] = useState([]),
     [loading, setLoading] = useState(Boolean(supabase)),
@@ -15,12 +15,12 @@ export function useRows(
     setLoading(true);
     const { data, error } = await supabase
       .from(table)
-      .select("*")
+      .select(select)
       .order(order, { ascending });
     setRows(data || []);
     setError(error ? "No pudimos cargar la información." : "");
     setLoading(false);
-  }, [table, order, ascending]);
+  }, [table, order, ascending, select]);
   useEffect(() => {
     refresh();
   }, [refresh]);

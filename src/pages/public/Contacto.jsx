@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,45 +8,56 @@ import { PageHeader } from "../../components/layout/Layout";
 import { Button, Field, Notice } from "../../components/ui";
 import { VideoSlot } from "../../components/video/Video";
 import { supabase, formsEnabled, unavailableMessage } from "../../lib/supabase";
+import { useAuth } from "../../lib/auth";
 const subjects = {
   general: "Información general",
-  "plan-diagnostico": "Plan Diagnóstico",
-  "plan-orienta": "Plan Orienta",
-  "plan-aprende": "Plan Aprende",
+  "plan-aprende": "Solicitar Plan 1 · Aprende",
+  "plan-orienta": "Solicitar Plan 2 · Orienta",
+  "plan-diagnostico": "Solicitar Plan 3 · Diagnosticadas",
   acompanamiento: "Acompañamiento emocional",
   otro: "Otro",
 };
-export const contactSchema = z.object({
-  nombre: z
-    .string()
-    .trim()
-    .min(3, "Escribe al menos 3 caracteres.")
-    .max(80, "Máximo 80 caracteres."),
-  email: z.email("Escribe un correo válido."),
-  asunto: z.enum(Object.keys(subjects)),
-  telefono: z
-    .string()
-    .refine(
-      (v) => !v || /^(\+?57\s?)?3\d{2}[\s-]?\d{3}[\s-]?\d{4}$/.test(v),
-      "Escribe un número celular colombiano válido.",
-    ),
-  mensaje: z
-    .string()
-    .trim()
-    .min(10, "Cuéntanos un poco más: mínimo 10 caracteres.")
-    .max(2000, "Máximo 2000 caracteres."),
-  consent: z.literal(true, {
-    error: "Necesitamos tu autorización para recibir el mensaje.",
-  }),
-  website: z.string().max(0),
-});
+export const contactSchema = z
+  .object({
+    nombre: z
+      .string()
+      .trim()
+      .min(3, "Escribe al menos 3 caracteres.")
+      .max(80, "Máximo 80 caracteres."),
+    email: z.email("Escribe un correo válido."),
+    asunto: z.enum(Object.keys(subjects)),
+    telefono: z
+      .string()
+      .refine(
+        (v) => !v || /^(\+?57\s?)?3\d{2}[\s-]?\d{3}[\s-]?\d{4}$/.test(v),
+        "Escribe un número celular colombiano válido.",
+      ),
+    mensaje: z
+      .string()
+      .trim()
+      .min(10, "Cuéntanos un poco más: mínimo 10 caracteres.")
+      .max(2000, "Máximo 2000 caracteres."),
+    consent: z.literal(true, {
+      error: "Necesitamos tu autorización para recibir el mensaje.",
+    }),
+    website: z.string().max(0),
+  })
+  // Para solicitar un plan el equipo necesita el celular: así coordina el pago.
+  .refine((v) => !v.asunto.startsWith("plan-") || Boolean(v.telefono), {
+    message: "Para solicitar un plan necesitamos tu celular.",
+    path: ["telefono"],
+  });
 export default function Contacto() {
   const [params] = useSearchParams();
   const initial = params.get("asunto");
   const [status, setStatus] = useState(null);
+  const { user, profile } = useAuth();
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
+    getValues,
     formState: { errors, isSubmitting },
     reset,
   } = useForm({
@@ -57,6 +68,14 @@ export default function Contacto() {
       telefono: "",
     },
   });
+  const isPlan = watch("asunto")?.startsWith("plan-");
+  // Con sesión iniciada se completan nombre y correo para que el equipo la encuentre en su cuenta.
+  useEffect(() => {
+    if (!user) return;
+    if (!getValues("nombre") && profile?.nombre)
+      setValue("nombre", profile.nombre);
+    if (!getValues("email") && user.email) setValue("email", user.email);
+  }, [user, profile, getValues, setValue]);
   async function send(values) {
     setStatus(null);
     if (!formsEnabled) {
@@ -71,8 +90,12 @@ export default function Contacto() {
         throw new Error(
           data?.error || "No pudimos enviar tu mensaje. Intenta nuevamente.",
         );
-      setStatus({ text: "Mensaje recibido. El equipo revisará tu solicitud." });
-      reset();
+      setStatus({
+        text: values.asunto.startsWith("plan-")
+          ? "¡Solicitud recibida! El equipo te escribirá a tu celular para coordinar el pago. Cuando esté confirmado, activaremos el plan en tu cuenta y te avisaremos por correo."
+          : "Mensaje recibido. El equipo revisará tu solicitud y te responderá pronto.",
+      });
+      reset({ asunto: "general", website: "", telefono: "" });
     } catch (e) {
       setStatus({ error: true, text: e.message });
     }
@@ -89,8 +112,30 @@ export default function Contacto() {
         <div>
           <form className="form-card" onSubmit={handleSubmit(send)} noValidate>
             <h2>
-              Envíanos un <em>mensaje</em>
+              {isPlan ? (
+                <>
+                  Solicita tu <em>plan</em>
+                </>
+              ) : (
+                <>
+                  Envíanos un <em>mensaje</em>
+                </>
+              )}
             </h2>
+            {isPlan && (
+              <p style={{ fontSize: 12, margin: "-6px 0 20px" }}>
+                Tu solicitud llega al equipo de EndoIntegral. Te escribiremos al
+                celular para coordinar el pago y, una vez confirmado,
+                activaremos el plan en tu cuenta.{" "}
+                {!user && (
+                  <>
+                    Usa el mismo correo con el que{" "}
+                    <Link to="/ingresar?modo=registro">creaste tu cuenta</Link>{" "}
+                    (o créala gratis).
+                  </>
+                )}
+              </p>
+            )}
             <div className="form-grid">
               <Field label="Nombre completo" error={errors.nombre?.message}>
                 <input
@@ -117,7 +162,11 @@ export default function Contacto() {
                 </select>
               </Field>
               <Field
-                label="Teléfono (opcional)"
+                label={
+                  isPlan
+                    ? "Celular (para coordinar tu plan)"
+                    : "Teléfono (opcional)"
+                }
                 error={errors.telefono?.message}
               >
                 <input
@@ -131,7 +180,11 @@ export default function Contacto() {
             <div style={{ marginTop: 22 }}>
               <Field label="Tu mensaje" error={errors.mensaje?.message}>
                 <textarea
-                  placeholder="Cuéntanos en qué podemos ayudarte…"
+                  placeholder={
+                    isPlan
+                      ? "Cuéntanos brevemente por qué te interesa este plan y en qué horario prefieres que te escribamos…"
+                      : "Cuéntanos en qué podemos ayudarte…"
+                  }
                   rows={5}
                   {...register("mensaje")}
                 />
@@ -164,7 +217,11 @@ export default function Contacto() {
             </p>
             <Button type="submit" disabled={isSubmitting}>
               <Send size={15} />
-              {isSubmitting ? "Enviando…" : "Enviar mensaje"}
+              {isSubmitting
+                ? "Enviando…"
+                : isPlan
+                  ? "Enviar solicitud"
+                  : "Enviar mensaje"}
             </Button>
             {status && (
               <div className="form-status">

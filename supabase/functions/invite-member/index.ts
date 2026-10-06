@@ -3,7 +3,7 @@ import { authenticated,json,preflight } from '../_shared/http.ts';
 import { capitalize,escapeHtml,mailConfigured,sendMail,siteUrl } from '../_shared/mail.ts';
 // Crea la cuenta con una contraseña temporal y la envía desde el Gmail del equipo.
 // En el primer ingreso la persona debe cambiarla (profiles.debe_cambiar_contrasena).
-const schema=z.object({nombre:z.string().trim().min(3).max(80),email:z.email(),plan:z.enum(['diagnostico','orienta','aprende']).default('aprende'),rol:z.enum(['miembra','admin']).default('miembra')});
+const schema=z.object({nombre:z.string().trim().min(3).max(80),email:z.email(),plan:z.enum(['ninguno','aprende','orienta','diagnostico']).default('ninguno'),rol:z.enum(['miembra','admin']).default('miembra')});
 const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
 function temporaryPassword(){const bytes=crypto.getRandomValues(new Uint8Array(12));return Array.from(bytes,b=>alphabet[b%alphabet.length]).join('');}
 function invitation(nombre:string,email:string,password:string,rol:string){
@@ -26,7 +26,8 @@ Deno.serve(async(req)=>{const response=preflight(req);if(response)return respons
  const password=temporaryPassword();
  const {data,error}=await db.auth.admin.createUser({email,password,email_confirm:true,user_metadata:{nombre}});
  if(error||!data.user)return json(req,{error:/already|registered|exists/i.test(error?.message||'')?'Ya existe una cuenta con ese correo.':'No se pudo crear la cuenta.'},400);
- const profile=await db.from('profiles').insert({id:data.user.id,nombre,plan,rol,activo:true,debe_cambiar_contrasena:true});
+ // El trigger on_auth_user_created ya creó el perfil gratuito: aquí se completa con el plan y el rol.
+ const profile=await db.from('profiles').upsert({id:data.user.id,nombre,email,plan:rol==='admin'?'diagnostico':plan,rol,activo:true,debe_cambiar_contrasena:true},{onConflict:'id'});
  if(profile.error){await db.auth.admin.deleteUser(data.user.id);return json(req,{error:'No se pudo activar el perfil. La invitación quedó invalidada.'},500);}
  let emailed=false;
  if(mailConfigured()){

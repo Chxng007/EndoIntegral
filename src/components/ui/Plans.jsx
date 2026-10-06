@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Clock3, Play } from "lucide-react";
+import { Clock3, Play, Stethoscope } from "lucide-react";
 import programa from "../../lib/content/programa";
 import { Badge, Button, Modal } from "./index";
 import { VideoSlot } from "../video/Video";
@@ -8,31 +8,31 @@ export default function Plans({ full = false }) {
   return (
     <>
       <div className="plan-grid">
-        {programa.plans.map((plan, i) => (
+        {programa.plans.map((plan) => (
           <article
-            className={`plan-card ${i === 0 ? "featured" : ""}`}
+            className={`plan-card ${plan.id === "orienta" ? "featured" : ""}`}
             key={plan.id}
           >
             <div className="plan-top">
-              <span className="plan-number">0{i + 1}</span>
-              <Badge>
-                {i === 0
-                  ? "Acompañamiento integral"
-                  : i === 1
-                    ? "Orientación y cuidado"
-                    : "Educación y bienestar"}
-              </Badge>
+              <span className="plan-number">PLAN {plan.number}</span>
+              <Badge>{plan.tagline}</Badge>
             </div>
             <span className="plan-subtitle">EndoIntegral</span>
             <h3>{plan.name}</h3>
             <p>Para {plan.audience}</p>
             <span className="plan-duration">
               <Clock3 size={14} />
-              {plan.weeks} semanas · A tu ritmo
+              {plan.weeks} semanas
             </span>
+            <p className="plan-price">
+              <strong>{plan.price}</strong> <span>{plan.priceNote}</span>
+            </p>
             {full && (
               <>
                 <p className="plan-objective">{plan.objective}</p>
+                <p className="plan-lead">
+                  <Stethoscope size={14} /> {plan.lead}
+                </p>
                 <details>
                   <summary>Todo lo que incluye tu plan</summary>
                   <ul>
@@ -41,16 +41,48 @@ export default function Plans({ full = false }) {
                     ))}
                   </ul>
                 </details>
+                {plan.team.length > 0 && (
+                  <details>
+                    <summary>Tu equipo interdisciplinario</summary>
+                    <ul>
+                      {plan.team.map(([role, text]) => (
+                        <li key={role}>
+                          <strong>{role}:</strong> {text}
+                        </li>
+                      ))}
+                    </ul>
+                    {plan.note && <p className="plan-note">{plan.note}</p>}
+                  </details>
+                )}
+                {plan.schedule.length > 0 && (
+                  <details>
+                    <summary>
+                      {plan.id === "diagnostico"
+                        ? "Las 10 sesiones de tu proceso"
+                        : `Cronograma de ${plan.weeks} semanas`}
+                    </summary>
+                    <ol>
+                      {plan.schedule.map(([title, text]) => (
+                        <li key={title}>
+                          <strong>{title}.</strong> {text}
+                        </li>
+                      ))}
+                    </ol>
+                  </details>
+                )}
+                <p className="plan-route">
+                  <span>Tu ruta:</span> {plan.route.join(" → ")}
+                </p>
               </>
             )}
             <Button
               to={
                 full ? `/contacto?asunto=plan-${plan.id}` : "/programa#planes"
               }
-              variant={i === 0 ? "primary" : "secondary"}
+              variant={plan.id === "orienta" ? "primary" : "secondary"}
               arrow
             >
-              {full ? "Quiero este plan" : "Conocer el plan"}
+              {full ? "Solicitar este plan" : "Conocer el plan"}
             </Button>
             {full && (
               <button className="plan-video" onClick={() => setVideo(plan.id)}>

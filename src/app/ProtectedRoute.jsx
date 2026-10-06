@@ -121,7 +121,8 @@ export default function ProtectedRoute({ admin = false }) {
     ) : (
       <Navigate to="/app" replace />
     );
-  if (!consent)
+  // La cuenta gratuita no registra datos de salud: la autorización se pide al activar un plan.
+  if (!consent && (profile.rol === "admin" || profile.plan !== "ninguno"))
     return (
       <section className="container section" style={{ maxWidth: 650 }}>
         <h1 style={{ fontSize: 39, marginBottom: 25 }}>

@@ -4077,3 +4077,197 @@ select[aria-invalid=true] {
     letter-spacing: 1px;
     color: var(--lavender-700)
 }
+
+/* Planes 1, 2 y 3 */
+.plan-card .plan-number {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.6px
+}
+
+.plan-card .plan-price {
+    margin: -6px 0 20px;
+    font-size: 12px;
+    color: var(--muted)
+}
+
+.plan-card .plan-price strong {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--plum)
+}
+
+.plan-card .plan-lead {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #8e6cb3;
+    margin-bottom: 16px
+}
+
+.plan-card ol {
+    padding-left: 18px
+}
+
+.plan-card .plan-note {
+    font-size: 11px;
+    margin-top: 6px;
+    color: var(--muted)
+}
+
+.plan-card .plan-route {
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--muted);
+    margin: 4px 0 22px
+}
+
+.plan-card .plan-route span {
+    font-weight: 800;
+    color: #755589
+}
+
+.acquire-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 40px 0 10px;
+    counter-reset: step
+}
+
+.acquire-steps li {
+    list-style: none;
+    padding: 22px;
+    border-radius: 18px;
+    background: #fffdfb;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted)
+}
+
+.acquire-steps li::before {
+    counter-increment: step;
+    content: counter(step);
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-bottom: 12px;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(135deg, var(--rose-cta), var(--lavender-deep))
+}
+
+.acquire-steps strong {
+    display: block;
+    color: var(--plum);
+    margin-bottom: 4px
+}
+
+@media (max-width: 950px) {
+    .acquire-steps {
+        grid-template-columns: 1fr 1fr
+    }
+}
+
+@media (max-width: 560px) {
+    .acquire-steps {
+        grid-template-columns: 1fr
+    }
+}
+
+.login-card .signup-switch {
+    display: block;
+    margin: 6px auto 10px;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 800;
+    color: #7d5594
+}
+
+.login-card .signup-note a {
+    font-weight: 600;
+    font-size: 11px
+}
+
+/* Inicio de la cuenta gratuita */
+.free-plans {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 28px
+}
+
+.free-plan h3 {
+    font-size: 26px;
+    margin: 12px 0 2px
+}
+
+.free-plan .free-plan-tagline {
+    font-size: 12px;
+    color: #8e6cb3;
+    font-weight: 700;
+    margin-bottom: 12px
+}
+
+.free-plan .free-plan-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    margin-bottom: 10px
+}
+
+.free-plan .free-plan-modules {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 18px
+}
+
+@media (max-width: 1100px) {
+    .free-plans {
+        grid-template-columns: 1fr
+    }
+}
+
+.admin-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 0 0 16px
+}
+
+.admin-filters input {
+    flex: 1;
+    min-width: 220px
+}
+
+.admin-record .admin-email {
+    font-size: 12px;
+    color: var(--muted);
+    margin: -6px 0 12px
+}
+
+.plan-card .plan-top {
+    gap: 12px;
+    align-items: flex-start
+}
+
+.plan-card .plan-top .plan-number {
+    white-space: nowrap;
+    padding-top: 6px
+}
+
+.plan-card .plan-top .badge {
+    text-align: right
+}
+
+.admin-filters select {
+    width: auto;
+    flex: none
+}
