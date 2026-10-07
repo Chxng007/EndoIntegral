@@ -304,12 +304,26 @@ Ingresa en ${location.origin}/ingresar`,
                     "invite-member",
                     { body: f },
                   );
-                  if (error || data?.error)
+                  if (error || data?.error) {
+                    // En errores la función responde 4xx: el mensaje real viene en error.context.
+                    const detail = await error?.context
+                      ?.json?.()
+                      .catch(() => null);
                     throw new Error(
-                      data?.error || "No se pudo enviar la invitación.",
+                      data?.error ||
+                        detail?.error ||
+                        "No se pudo enviar la invitación.",
                     );
+                  }
                   refresh();
-                  if (data.emailed) {
+                  if (data.existing) {
+                    setOpen(false);
+                    toast(
+                      data.emailed
+                        ? `${f.email} ya tenía cuenta: le asignamos el plan y rol elegidos y le avisamos por correo.`
+                        : `${f.email} ya tenía cuenta: le asignamos el plan y rol elegidos.`,
+                    );
+                  } else if (data.emailed) {
                     setOpen(false);
                     toast(`Invitación enviada a ${f.email}.`);
                   } else
