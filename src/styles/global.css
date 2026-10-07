@@ -4271,3 +4271,37 @@ select[aria-invalid=true] {
     width: auto;
     flex: none
 }
+
+/* Tarjetas de planes de la cuenta gratuita: mismas alturas y botones alineados abajo. */
+.free-plans {
+    align-items: stretch
+}
+
+.free-plan {
+    display: flex;
+    flex-direction: column;
+    height: 100%
+}
+
+.free-plan .badge {
+    align-self: flex-start
+}
+
+.free-plan .free-plan-tagline {
+    min-height: 3.2em
+}
+
+.free-plan .free-plan-modules {
+    flex: 1
+}
+
+.free-plan .button-row {
+    margin-top: auto;
+    align-items: center
+}
+
+@media (max-width: 1100px) {
+    .free-plan .free-plan-tagline {
+        min-height: 0
+    }
+}
