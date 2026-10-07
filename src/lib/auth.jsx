@@ -48,6 +48,21 @@ export function AuthProvider({ children }) {
         .limit(1),
     ]);
     if (id !== request.current) return;
+    // La sesión es válida pero la cuenta ya no tiene perfil (se borró): se cierra la sesión y
+    // la página de ingreso avisa que la cuenta no existe.
+    if (p.error?.code === "PGRST116" || (!p.error && !p.data)) {
+      try {
+        sessionStorage.setItem("endo-cuenta-eliminada", "1");
+      } catch {
+        /* El aviso es opcional. */
+      }
+      loadedFor.current = null;
+      setProfile(null);
+      setUser(null);
+      setLoading(false);
+      await supabase.auth.signOut();
+      return;
+    }
     if (p.error || c.error) {
       loadedFor.current = null;
       setProfile(null);

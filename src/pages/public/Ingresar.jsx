@@ -4,6 +4,21 @@ import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 import { Button, Field, Notice } from "../../components/ui";
 import { supabase, unavailableMessage } from "../../lib/supabase";
 import { useAuth } from "../../lib/auth";
+// Aviso que deja auth.jsx cuando alguien inicia sesión con una cuenta que fue eliminada.
+function deletedNotice() {
+  try {
+    if (sessionStorage.getItem("endo-cuenta-eliminada")) {
+      sessionStorage.removeItem("endo-cuenta-eliminada");
+      return {
+        error: true,
+        text: "Esta cuenta no existe o fue eliminada. Si crees que es un error, escríbenos; también puedes crear una cuenta nueva.",
+      };
+    }
+  } catch {
+    /* Sin almacenamiento disponible no hay aviso. */
+  }
+  return null;
+}
 export default function Ingresar() {
   const [params] = useSearchParams();
   const [show, setShow] = useState(false),
@@ -11,7 +26,7 @@ export default function Ingresar() {
     [mode, setMode] = useState(
       params.get("modo") === "registro" ? "register" : "login",
     ),
-    [status, setStatus] = useState(null),
+    [status, setStatus] = useState(deletedNotice),
     [busy, setBusy] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -154,7 +169,11 @@ export default function Ingresar() {
         });
         if (error)
           throw new Error(
-            "No pudimos iniciar sesión. Revisa tu correo y contraseña.",
+            /invalid login credentials/i.test(error.message)
+              ? "El correo o la contraseña no son correctos, o la cuenta no existe. Si no tienes cuenta, puedes crear una gratis."
+              : /not confirmed/i.test(error.message)
+                ? "Aún no has confirmado tu correo. Abre el enlace que te enviamos al registrarte."
+                : "No pudimos iniciar sesión. Intenta nuevamente.",
           );
         navigate("/app", { replace: true });
       }
