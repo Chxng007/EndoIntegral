@@ -669,6 +669,12 @@ export function AdminContent({ kind }) {
         throw new Error("Añade el ID del video de YouTube.");
       if (kind === "recursos" && !payload.pdf_path && !editing.pdf_path)
         throw new Error("Añade el documento PDF.");
+      // Un PDF nuevo reemplaza al anterior: las páginas del lector eran del documento viejo.
+      if (kind === "recursos" && payload.pdf_path) {
+        payload.carpeta = null;
+        payload.paginas = null;
+        payload.proporcion = null;
+      }
       if (kind === "videos" && payload.youtube_id) payload.storage_path = null;
       const key = config.key || "id";
       const query = editing[key]

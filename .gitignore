@@ -6,3 +6,6 @@ dist/
 test-results/
 playwright-report/
 artifacts/
+
+# PDF originales sin comprimir (muy pesados para GitHub/Vercel); la web usa public/docs y public/pdf
+docs/originales/

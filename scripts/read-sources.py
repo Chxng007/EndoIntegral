@@ -28,9 +28,12 @@ for table in doc.tables:
         parts.append(' | '.join(c.text for c in row.cells))
 (out / 'estructura.txt').write_text('\n'.join(parts), encoding='utf-8')
 shutil.copyfile(root/'PROMPT_MAESTRO_EndoIntegral.md',out/'PROMPT_MAESTRO_EndoIntegral.md')
-Path('public/pdf').mkdir(parents=True,exist_ok=True)
+# Las guías son contenido de los planes: van al bucket privado «resources» de Supabase
+# (ver 202610090012_protected_documents.sql), nunca a public/.
+Path('docs/originales/protegidos/yoga').mkdir(parents=True,exist_ok=True)
+Path('docs/originales/protegidos/mindfulness').mkdir(parents=True,exist_ok=True)
 Path('public/img').mkdir(parents=True,exist_ok=True)
-shutil.copyfile(root/files[0], 'public/pdf/meditaciones-mindfulness.pdf')
-shutil.copyfile(root/files[1], 'public/pdf/yoga-terapia-endometriosis.pdf')
+shutil.copyfile(root/files[0], 'docs/originales/protegidos/mindfulness/meditaciones-mindfulness.pdf')
+shutil.copyfile(root/files[1], 'docs/originales/protegidos/yoga/yoga-terapia-endometriosis.pdf')
 shutil.copyfile(root/'arf.jpeg', 'docs/sources/referencia-anatomica.jpeg')
 print(json.dumps(inventory, ensure_ascii=False, indent=2))

@@ -21,15 +21,9 @@ Deno.serve(async(req)=>{
   if(limits.some(r=>!r.data))return json(req,{error:'Ya pediste varios enlaces. Intenta nuevamente en una hora.'},429);
   const {data,error}=await db.auth.admin.generateLink({type:'recovery',email});
   if(error||!data?.properties?.hashed_token)return done;
-  let {data:profile}=await db.from('profiles').select('nombre,activo').eq('id',data.user.id).maybeSingle();
-  // Cuenta sin perfil (p. ej., se borró su fila en profiles): se le recrea como cuenta gratuita.
-  if(!profile){
-   const nombre=String(data.user.user_metadata?.nombre||email.split('@')[0]).slice(0,80).padEnd(2,'·');
-   const created=await db.from('profiles').insert({id:data.user.id,nombre,email,rol:'miembra',plan:'ninguno',activo:true}).select('nombre,activo').single();
-   if(created.error)return done;
-   profile=created.data;
-  }
-  if(!profile.activo)return done;
+  // Una cuenta eliminada (sin perfil) o desactivada no recibe enlace: para la página no existe.
+  const {data:profile}=await db.from('profiles').select('nombre,activo').eq('id',data.user.id).maybeSingle();
+  if(!profile?.activo)return done;
   const site=siteUrl(),url=`${site}/ingresar?modo=contrasena&type=recovery&token_hash=${encodeURIComponent(data.properties.hashed_token)}`;
   const first=escapeHtml(capitalize((profile.nombre||'').split(/\s+/)[0]||''));
   try{

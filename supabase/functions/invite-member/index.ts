@@ -36,7 +36,17 @@ Deno.serve(async(req)=>{const response=preflight(req);if(response)return respons
  const adminsActive=async()=>{const {count}=await db.from('profiles').select('id',{count:'exact',head:true}).eq('rol','admin').eq('activo',true);return count??0;};
  const finalPlan=rol==='admin'?'diagnostico':plan;
  const password=temporaryPassword();
- const {data,error}=await db.auth.admin.createUser({email,password,email_confirm:true,user_metadata:{nombre}});
+ const create=()=>db.auth.admin.createUser({email,password,email_confirm:true,user_metadata:{nombre}});
+ let {data,error}=await create();
+ // Restos de una cuenta eliminada (acceso sin perfil): se borran y se crea una cuenta nueva.
+ if(error&&/already|registered|exists/i.test(error.message||'')){
+  const link=await db.auth.admin.generateLink({type:'magiclink',email});
+  const oldId=link.data?.user?.id;
+  if(oldId){
+   const {data:profile}=await db.from('profiles').select('id').eq('id',oldId).maybeSingle();
+   if(!profile){await db.auth.admin.deleteUser(oldId);({data,error}=await create());}
+  }
+ }
  if(error||!data.user){
   if(!/already|registered|exists/i.test(error?.message||''))return json(req,{error:'No se pudo crear la cuenta.'},400);
   // El correo ya tiene cuenta (p. ej., se registró gratis): se le asigna el plan y el rol a esa misma cuenta.
@@ -44,6 +54,7 @@ Deno.serve(async(req)=>{const response=preflight(req);if(response)return respons
   const userId=link.data?.user?.id;
   if(!userId)return json(req,{error:'Ese correo ya tiene cuenta, pero no pudimos encontrarla.'},400);
   const {data:current}=await db.from('profiles').select('nombre,rol').eq('id',userId).maybeSingle();
+  if(!current)return json(req,{error:'No pudimos preparar esa cuenta. Intenta nuevamente.'},500);
   if(rol==='admin'&&current?.rol!=='admin'&&(await adminsActive())>=6)return json(req,{error:'Ya hay 6 administradoras activas.'},400);
   const saved=await db.from('profiles').upsert({id:userId,nombre:current?.nombre||nombre,email,plan:finalPlan,rol,activo:true},{onConflict:'id'});
   if(saved.error)return json(req,{error:'No pudimos actualizar esa cuenta.'},500);

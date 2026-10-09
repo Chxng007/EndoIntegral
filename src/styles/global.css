@@ -4305,3 +4305,141 @@ select[aria-invalid=true] {
         min-height: 0
     }
 }
+
+/* Lector de cartilla y diario */
+.doc-reader {
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: #fffdfb;
+    padding: 22px
+}
+
+.doc-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 18px
+}
+
+.doc-toolbar strong {
+    display: block;
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--plum)
+}
+
+.doc-toolbar span {
+    font-size: 12px;
+    color: var(--muted)
+}
+
+.doc-stage {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    align-items: center;
+    gap: 12px;
+    border-radius: 18px;
+    padding: 18px 0;
+    background: radial-gradient(ellipse at 50% 0%, #eee5f4, #f8f1f4 70%)
+}
+
+.doc-page {
+    display: block;
+    width: 100%;
+    max-width: 560px;
+    height: auto;
+    max-height: 78vh;
+    object-fit: contain;
+    margin: 0 auto;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 18px 45px #3b2a4d26;
+    animation: doc-in .25s ease
+}
+
+@keyframes doc-in {
+    from {
+        opacity: .4
+    }
+}
+
+.doc-nav {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #fff;
+    color: #6b4a91;
+    box-shadow: 0 6px 16px #8e6cb326;
+    justify-self: center
+}
+
+.doc-nav:disabled {
+    opacity: .35;
+    cursor: default
+}
+
+.doc-count {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin: 12px 0
+}
+
+.doc-thumbs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 2px 8px;
+    scrollbar-width: thin
+}
+
+.doc-thumbs button {
+    flex: none;
+    width: 58px;
+    padding: 0;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background: transparent;
+    opacity: .65
+}
+
+.doc-thumbs button[aria-current="page"] {
+    border-color: #8e6cb3;
+    opacity: 1
+}
+
+.doc-thumbs img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 4px
+}
+
+@media (max-width: 760px) {
+    .doc-reader {
+        padding: 14px;
+        border-radius: 18px
+    }
+
+    .doc-stage {
+        grid-template-columns: 34px minmax(0, 1fr) 34px;
+        gap: 6px;
+        padding: 12px 0
+    }
+
+    .doc-nav {
+        width: 34px;
+        height: 34px
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .doc-page {
+        animation: none
+    }
+}

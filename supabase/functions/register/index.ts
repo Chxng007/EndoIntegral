@@ -19,7 +19,17 @@ Deno.serve(async(req)=>{
   const limits=await Promise.all([`signup:ip:${ip}`,`signup:email:${email}`].map(async k=>db.rpc('consume_contact_limit',{key_value:await sha256(`${salt}:${k}`)})));
   if(limits.some(r=>r.error))return json(req,{error:'Servicio temporalmente no disponible.'},503);
   if(limits.some(r=>!r.data))return json(req,{error:'Hiciste varios intentos. Intenta nuevamente en una hora.'},429);
-  const {data,error}=await db.auth.admin.generateLink({type:'signup',email,password,options:{data:{nombre}}});
+  const signup=()=>db.auth.admin.generateLink({type:'signup',email,password,options:{data:{nombre}}});
+  let {data,error}=await signup();
+  if(error&&/already|registered|exists/i.test(error.message||'')){
+   // Restos de una cuenta eliminada (acceso sin perfil): se limpian y se registra de nuevo.
+   const existing=await db.auth.admin.generateLink({type:'magiclink',email});
+   const oldId=existing.data?.user?.id;
+   if(oldId){
+    const {data:profile}=await db.from('profiles').select('id').eq('id',oldId).maybeSingle();
+    if(!profile){await db.auth.admin.deleteUser(oldId);({data,error}=await signup());}
+   }
+  }
   if(error||!data?.properties?.hashed_token)return done;
   const site=siteUrl(),url=`${site}/ingresar?modo=confirmar&type=signup&token_hash=${encodeURIComponent(data.properties.hashed_token)}`;
   try{

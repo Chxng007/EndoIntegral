@@ -21,69 +21,49 @@ import {
   SectionTitle,
 } from "../../components/ui";
 import { VideoEmbed, VideoSlot } from "../../components/video/Video";
+import DocumentReader from "../../components/ui/DocumentReader";
+import { useResourceDocument } from "../../lib/documents";
 import { poses } from "../../lib/content/recursos";
 import { mindfulnessVideos, videos, yogaVideos } from "../../lib/videos";
 import { supabase } from "../../lib/supabase";
+// Documento protegido (cartilla o diario) con lector página por página. El equipo puede
+// reemplazarlo desde el panel (Recursos) subiendo un PDF nuevo de la misma categoría.
 export function ResourceDocument({ category, title }) {
-  const [resource, setResource] = useState(null),
-    [url, setUrl] = useState(""),
-    [loaded, setLoaded] = useState(false),
-    [error, setError] = useState("");
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      if (!supabase) {
-        setLoaded(true);
-        return;
-      }
-      const { data, error } = await supabase
-        .from("resources")
-        .select("*")
-        .eq("categoria", category)
-        .order("orden")
-        .limit(1)
-        .maybeSingle();
-      if (!alive) return;
-      if (error) {
-        setError("No pudimos cargar el documento. Intenta de nuevo.");
-        setLoaded(true);
-        return;
-      }
-      setResource(data);
-      if (data?.pdf_path) {
-        const { data: s, error } = await supabase.storage
-          .from("resources")
-          .createSignedUrl(data.pdf_path, 900);
-        if (!alive) return;
-        if (error) setError("No pudimos abrir el archivo.");
-        else setUrl(s.signedUrl);
-      }
-      setLoaded(true);
-    })();
-    return () => {
-      alive = false;
-    };
-  }, [category]);
-  if (!loaded) return <Loading />;
-  if (error) return <Notice tone="error">{error}</Notice>;
-  return url ? (
-    <>
-      <p>{resource.descripcion}</p>
-      <iframe className="pdf-frame" src={url} title={title} />
-      <Button href={url} target="_blank" rel="noreferrer">
+  const state = useResourceDocument(category);
+  if (state.status === "loading") return <Loading />;
+  if (state.status === "error")
+    return (
+      <Notice tone="error">
+        No pudimos abrir {title.toLowerCase()}. Recarga la página para
+        intentarlo de nuevo.
+      </Notice>
+    );
+  if (state.status === "empty")
+    return (
+      <EmptyState icon={BookOpen} title={`${title}, próximamente`}>
+        El equipo está preparando este material. Lo encontrarás aquí cuando esté
+        disponible.
+      </EmptyState>
+    );
+  return <DocumentReader doc={state.doc} />;
+}
+// Botón de descarga de una guía protegida (yoga, mindfulness).
+function ResourceDownload({ category, label }) {
+  const state = useResourceDocument(category);
+  if (state.status !== "ready")
+    return (
+      <Button variant="secondary" disabled>
         <Download size={15} />
-        Abrir y descargar {title.toLowerCase()}
+        {state.status === "loading"
+          ? "Preparando la guía…"
+          : "Guía no disponible"}
       </Button>
-      <p style={{ fontSize: 10, marginTop: 12 }}>
-        El enlace caduca después de 15 minutos. Recarga la página para obtener
-        uno nuevo.
-      </p>
-    </>
-  ) : (
-    <EmptyState icon={BookOpen} title={`${title}, próximamente`}>
-      El equipo está preparando este material. Lo encontrarás aquí cuando esté
-      disponible.
-    </EmptyState>
+    );
+  return (
+    <Button href={state.doc.downloadUrl} variant="secondary">
+      <Download size={15} />
+      {label}
+    </Button>
   );
 }
 export default function Recursos() {
@@ -128,8 +108,9 @@ export default function Recursos() {
         <VideoEmbed {...videos.calma} />
       </div>
       <p style={{ fontSize: 12, marginTop: 16 }}>
-        Encuentra los {yogaVideos.filter((k) => videos[k].kind === "yoga").length}{" "}
-        videos de yoga en <Link to="/app/recursos/yoga">Yoga terapia</Link> y las{" "}
+        Encuentra los{" "}
+        {yogaVideos.filter((k) => videos[k].kind === "yoga").length} videos de
+        yoga en <Link to="/app/recursos/yoga">Yoga terapia</Link> y las{" "}
         {mindfulnessVideos.length} meditaciones guiadas en{" "}
         <Link to="/app/recursos/mindfulness">Mindfulness</Link>.
       </p>
@@ -203,14 +184,7 @@ export function Yoga() {
       />
       <div className="resource-hero">
         <p>Relajación · Movilidad · Conexión corporal · Descanso</p>
-        <Button
-          href="/pdf/yoga-terapia-endometriosis.pdf"
-          download
-          variant="secondary"
-        >
-          <Download size={15} />
-          Descargar guía de posturas
-        </Button>
+        <ResourceDownload category="yoga" label="Descargar guía de posturas" />
       </div>
       <Notice>
         Consulta con tu médica antes de iniciar si estás en una crisis de dolor
@@ -343,14 +317,7 @@ export function Mindfulness() {
       />
       <div className="resource-hero">
         <p>Elige tu propia pausa. No necesitas hacerlo perfecto.</p>
-        <Button
-          href="/pdf/meditaciones-mindfulness.pdf"
-          download
-          variant="secondary"
-        >
-          <Download size={15} />
-          Descargar guía
-        </Button>
+        <ResourceDownload category="mindfulness" label="Descargar guía" />
       </div>
       <div className="practice-panel">
         <p className="eyebrow">TRES MINUTOS PARA TI</p>
