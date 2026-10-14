@@ -64,19 +64,18 @@ export default function DocumentReader({ doc }) {
     const next = turn.dir === 1;
     const opts = { duration: TURN_MS, easing: EASE, fill: "both" };
     const animations = [
+      // La hoja se dobla hacia el lomo hasta quedar de canto (−90°) y nunca pasa al otro lado,
+      // así todo el movimiento ocurre dentro del recuadro de la página.
       leafRef.current.animate(
         next
-          ? [
-              { transform: "rotateY(0deg)" },
-              { transform: "rotateY(-90deg) scale(1.015)", offset: 0.5 },
-              { transform: "rotateY(-180deg)" },
-            ]
-          : [
-              { transform: "rotateY(-180deg)" },
-              { transform: "rotateY(-90deg) scale(1.015)", offset: 0.5 },
-              { transform: "rotateY(0deg)" },
-            ],
-        opts,
+          ? [{ transform: "rotateY(0deg)" }, { transform: "rotateY(-90deg)" }]
+          : [{ transform: "rotateY(-90deg)" }, { transform: "rotateY(0deg)" }],
+        {
+          ...opts,
+          easing: next
+            ? "cubic-bezier(.5, 0, .75, .4)"
+            : "cubic-bezier(.25, .6, .5, 1)",
+        },
       ),
       shadeRef.current?.animate(
         next
@@ -87,7 +86,12 @@ export default function DocumentReader({ doc }) {
       ...lightRefs.current
         .filter(Boolean)
         .map((el) =>
-          el.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], opts),
+          el.animate(
+            next
+              ? [{ opacity: 0 }, { opacity: 1 }]
+              : [{ opacity: 1 }, { opacity: 0 }],
+            opts,
+          ),
         ),
     ].filter(Boolean);
     let alive = true;
@@ -215,7 +219,7 @@ export default function DocumentReader({ doc }) {
                   className="doc-leaf"
                   style={{
                     transform:
-                      turn.dir === 1 ? "rotateY(0deg)" : "rotateY(-180deg)",
+                      turn.dir === 1 ? "rotateY(0deg)" : "rotateY(-90deg)",
                   }}
                   aria-hidden="true"
                 >

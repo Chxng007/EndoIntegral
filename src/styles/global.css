@@ -4337,6 +4337,7 @@ select[aria-invalid=true] {
 }
 
 .doc-stage {
+    overflow: hidden;
     display: grid;
     grid-template-columns: 44px minmax(0, 1fr) 44px;
     align-items: center;
@@ -4567,7 +4568,11 @@ select[aria-invalid=true] {
     position: relative;
     margin: 0 auto;
     perspective: 2400px;
-    perspective-origin: 30% 50%
+    perspective-origin: 0% 50%;
+    /* Todo el giro queda recortado al área de la página: nunca se sale del recuadro. */
+    overflow: hidden;
+    border-radius: 6px 12px 12px 6px;
+    box-shadow: 0 22px 50px #3b2a4d2e
 }
 
 .doc-sheet {
@@ -4653,7 +4658,7 @@ select[aria-invalid=true] {
 .doc-leaf-light {
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, #3b2a4d00 40%, #3b2a4d38);
+    background: linear-gradient(90deg, #3b2a4d14, #3b2a4d55);
     opacity: 0;
     pointer-events: none
 }
