@@ -1,15 +1,30 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   ChevronLeft,
   ChevronRight,
   Download,
   Maximize2,
   Printer,
+  Sparkles,
   X,
 } from "lucide-react";
 import { Button } from "./index";
-import { useReducedMotion } from "../../lib/hooks";
-const TURN_MS = 760;
+const TURN_MS = 900;
+const EASE = "cubic-bezier(.45, .05, .25, 1)";
+// Preferencia guardada en este navegador: animación de páginas activada o no.
+const readMotion = () => {
+  try {
+    return localStorage.getItem("endo-lector-animacion") !== "no";
+  } catch {
+    return true;
+  }
+};
 // Lector tipo cartilla: la hoja gira sobre el lomo al pasar de página (con su reverso y sombra),
 // miniaturas, flechas del teclado, vista ampliada para leer el texto pequeño y botones para
 // descargar o imprimir. `doc.pages` son enlaces firmados del bucket privado (src/lib/documents.js).
@@ -19,8 +34,14 @@ export default function DocumentReader({ doc }) {
   // Hoja que está girando: from → to; dir 1 = adelante, -1 = atrás.
   const [turn, setTurn] = useState(null);
   const [zoom, setZoom] = useState(false);
-  const reduced = useReducedMotion();
-  const thumbs = useRef(null);
+  // La transición se hace con la Web Animations API (como en una presentación de PowerPoint):
+  // así se ve aunque el sistema operativo tenga las animaciones reducidas, y la persona puede
+  // apagarla con el interruptor «Animación».
+  const [motion, setMotion] = useState(readMotion);
+  const thumbs = useRef(null),
+    leafRef = useRef(null),
+    shadeRef = useRef(null),
+    lightRefs = useRef([]);
   const [w, h] = String(doc.ratio || "3 / 4")
     .split("/")
     .map((n) => Number(n.trim()) || 1);
@@ -28,19 +49,60 @@ export default function DocumentReader({ doc }) {
     (target) => {
       const to = Math.min(total, Math.max(1, target));
       if (to === page || turn) return;
-      if (reduced) {
+      if (!motion) {
         setPage(to);
         return;
       }
       setTurn({ from: page, to, dir: to > page ? 1 : -1 });
       setPage(to);
     },
-    [page, total, turn, reduced],
+    [page, total, turn, motion],
   );
-  // Si el navegador no dispara animationend (pestaña oculta), la hoja se termina igual.
+  // Ejecuta el giro de la hoja, la sombra sobre la página de abajo y el brillo del papel.
+  useLayoutEffect(() => {
+    if (!turn || !leafRef.current) return;
+    const next = turn.dir === 1;
+    const opts = { duration: TURN_MS, easing: EASE, fill: "both" };
+    const animations = [
+      leafRef.current.animate(
+        next
+          ? [
+              { transform: "rotateY(0deg)" },
+              { transform: "rotateY(-90deg) scale(1.015)", offset: 0.5 },
+              { transform: "rotateY(-180deg)" },
+            ]
+          : [
+              { transform: "rotateY(-180deg)" },
+              { transform: "rotateY(-90deg) scale(1.015)", offset: 0.5 },
+              { transform: "rotateY(0deg)" },
+            ],
+        opts,
+      ),
+      shadeRef.current?.animate(
+        next
+          ? [{ opacity: 0.85 }, { opacity: 0 }]
+          : [{ opacity: 0 }, { opacity: 0.85 }],
+        opts,
+      ),
+      ...lightRefs.current
+        .filter(Boolean)
+        .map((el) =>
+          el.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], opts),
+        ),
+    ].filter(Boolean);
+    let alive = true;
+    animations[0].finished
+      .then(() => alive && setTurn(null))
+      .catch(() => alive && setTurn(null));
+    return () => {
+      alive = false;
+      animations.forEach((a) => a.cancel());
+    };
+  }, [turn]);
+  // Respaldo: si la animación no termina (pestaña oculta), la hoja se cierra igual.
   useEffect(() => {
     if (!turn) return;
-    const t = setTimeout(() => setTurn(null), TURN_MS + 120);
+    const t = setTimeout(() => setTurn(null), TURN_MS + 300);
     return () => clearTimeout(t);
   }, [turn]);
   useEffect(() => {
@@ -85,10 +147,35 @@ export default function DocumentReader({ doc }) {
             <Download size={15} />
             Descargar PDF
           </Button>
-          <Button href={doc.pdf} target="_blank" rel="noreferrer" variant="plain">
+          <Button
+            href={doc.pdf}
+            target="_blank"
+            rel="noreferrer"
+            variant="plain"
+          >
             <Printer size={15} />
             Abrir para imprimir
           </Button>
+          <button
+            type="button"
+            className={`doc-motion ${motion ? "is-on" : ""}`}
+            aria-pressed={motion}
+            onClick={() => {
+              const value = !motion;
+              setMotion(value);
+              try {
+                localStorage.setItem(
+                  "endo-lector-animacion",
+                  value ? "si" : "no",
+                );
+              } catch {
+                /* La preferencia es opcional. */
+              }
+            }}
+          >
+            <Sparkles size={14} /> Animación{" "}
+            {motion ? "activada" : "desactivada"}
+          </button>
         </div>
       </div>
       {total > 0 && (
@@ -124,23 +211,34 @@ export default function DocumentReader({ doc }) {
               </button>
               {turn && (
                 <div
-                  className={`doc-leaf ${turn.dir === 1 ? "turn-next" : "turn-prev"}`}
-                  style={{ animationDuration: `${TURN_MS}ms` }}
-                  onAnimationEnd={(e) => {
-                    if (e.target === e.currentTarget) setTurn(null);
+                  ref={leafRef}
+                  className="doc-leaf"
+                  style={{
+                    transform:
+                      turn.dir === 1 ? "rotateY(0deg)" : "rotateY(-180deg)",
                   }}
                   aria-hidden="true"
                 >
                   <div className="doc-leaf-front">
                     <img src={src(leaf)} alt="" />
+                    <span
+                      className="doc-leaf-light"
+                      ref={(el) => (lightRefs.current[0] = el)}
+                    />
                   </div>
-                  <div className="doc-leaf-back" />
+                  <div className="doc-leaf-back">
+                    <span
+                      className="doc-leaf-light"
+                      ref={(el) => (lightRefs.current[1] = el)}
+                    />
+                  </div>
                 </div>
               )}
               {turn && (
                 <span
+                  ref={shadeRef}
                   className={`doc-shade ${turn.dir === 1 ? "shade-next" : "shade-prev"}`}
-                  style={{ animationDuration: `${TURN_MS}ms` }}
+                  style={{ opacity: turn.dir === 1 ? 0.85 : 0 }}
                   aria-hidden="true"
                 />
               )}

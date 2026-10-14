@@ -4618,8 +4618,6 @@ select[aria-invalid=true] {
     inset: 0;
     transform-origin: left center;
     transform-style: preserve-3d;
-    animation-timing-function: cubic-bezier(.45, .05, .25, 1);
-    animation-fill-mode: both;
     pointer-events: none;
     z-index: 2
 }
@@ -4651,53 +4649,13 @@ select[aria-invalid=true] {
     background: linear-gradient(90deg, #ece2ea, #f8f2f0 45%, #fdfaf8)
 }
 
-.doc-leaf-front::after,
-.doc-leaf-back::after {
-    content: "";
+/* Brillo del papel al curvarse (lo anima DocumentReader con la Web Animations API). */
+.doc-leaf-light {
     position: absolute;
     inset: 0;
     background: linear-gradient(90deg, #3b2a4d00 40%, #3b2a4d38);
     opacity: 0;
-    animation: leaf-light 760ms ease-in-out both
-}
-
-.turn-next {
-    animation-name: leaf-next
-}
-
-.turn-prev {
-    animation-name: leaf-prev
-}
-
-@keyframes leaf-next {
-    0% {
-        transform: rotateY(0deg)
-    }
-
-    100% {
-        transform: rotateY(-180deg)
-    }
-}
-
-@keyframes leaf-prev {
-    0% {
-        transform: rotateY(-180deg)
-    }
-
-    100% {
-        transform: rotateY(0deg)
-    }
-}
-
-@keyframes leaf-light {
-    0%,
-    100% {
-        opacity: 0
-    }
-
-    50% {
-        opacity: 1
-    }
+    pointer-events: none
 }
 
 /* Sombra que la hoja proyecta sobre la página de abajo mientras gira. */
@@ -4706,39 +4664,15 @@ select[aria-invalid=true] {
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    border-radius: 6px 12px 12px 6px;
-    animation-timing-function: ease-in-out;
-    animation-fill-mode: both
+    border-radius: 6px 12px 12px 6px
 }
 
 .shade-next {
-    background: linear-gradient(90deg, #3b2a4d55, #3b2a4d00 70%);
-    animation-name: shade-next
+    background: linear-gradient(90deg, #3b2a4d55, #3b2a4d00 70%)
 }
 
 .shade-prev {
-    background: linear-gradient(90deg, #3b2a4d00 30%, #3b2a4d45);
-    animation-name: shade-prev
-}
-
-@keyframes shade-next {
-    0% {
-        opacity: .9
-    }
-
-    100% {
-        opacity: 0
-    }
-}
-
-@keyframes shade-prev {
-    0% {
-        opacity: 0
-    }
-
-    100% {
-        opacity: .9
-    }
+    background: linear-gradient(90deg, #3b2a4d00 30%, #3b2a4d45)
 }
 
 /* Vista ampliada para leer el texto pequeño */
@@ -4791,9 +4725,21 @@ select[aria-invalid=true] {
     box-shadow: 0 20px 60px #0006
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .doc-leaf,
-    .doc-shade {
-        display: none
-    }
+.doc-motion {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted)
+}
+
+.doc-motion.is-on {
+    color: #6b4a91;
+    border-color: #d9c2e4;
+    background: #f6eef9
 }
