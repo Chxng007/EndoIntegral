@@ -8,7 +8,7 @@ import {
   Notice,
   useToast,
 } from "../../components/ui";
-import { VideoEmbed, VideoSlot } from "../../components/video/Video";
+import { VideoEmbed } from "../../components/video/Video";
 import { useAuth } from "../../lib/auth";
 import { dateLabel, useRows } from "../../lib/hooks";
 import { supabase, result } from "../../lib/supabase";
@@ -94,20 +94,14 @@ export default function Acompanamiento() {
                   ))}
                 </div>
                 <p>{p.bio}</p>
-                <div style={{ margin: "20px 0" }}>
-                  {p.video_id ? (
+                {p.video_id && (
+                  <div style={{ margin: "20px 0" }}>
                     <VideoEmbed
                       id={p.video_id}
                       title={`Conoce a ${p.nombre}`}
                     />
-                  ) : (
-                    <VideoSlot
-                      title={`Conoce a ${p.nombre}`}
-                      name={`profesional_${p.id}`}
-                      compact
-                    />
-                  )}
-                </div>
+                  </div>
+                )}
                 <Button
                   onClick={() => {
                     setPreferred(p.id);

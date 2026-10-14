@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { ExternalLink, Play } from "lucide-react";
+import { ExternalLink, Lightbulb, Play } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useReducedMotion } from "../../lib/hooks";
 import { siteVideoSlots } from "../../lib/videos";
+import { guias } from "../../lib/content/guias";
+import Icon from "../ui/Icon";
 export function VideoEmbed({ id, title, channel, kind }) {
   const [playing, setPlaying] = useState(false);
   const label = kind === "meditacion" ? "REPRODUCIR MEDITACIÓN" : "REPRODUCIR VIDEO";
@@ -66,10 +68,12 @@ export function VideoSlot({ name, title, compact = false }) {
     };
   }, [name]);
   const label = title || siteVideoSlots[name] || "Un mensaje del equipo";
+  const guide = guias[name];
+  let media = null;
   if (video?.youtube_id)
-    return <VideoEmbed id={video.youtube_id} title={label} />;
-  if (video?.storage_path)
-    return (
+    media = <VideoEmbed id={video.youtube_id} title={label} />;
+  else if (video?.storage_path)
+    media = (
       <video
         className="owned-video"
         controls
@@ -83,15 +87,48 @@ export function VideoSlot({ name, title, compact = false }) {
         aria-label={label}
       />
     );
-  return (
-    <div className={`video-slot ${compact ? "compact" : ""}`}>
-      <img src="/img/logo-circular.jpeg" alt="" width="80" height="80" />
-      <span className="eyebrow">UN MOMENTO PARA TI</span>
-      <h3>{label}</h3>
-      <span className="video-soon">
-        <Play size={13} /> Video próximamente
-      </span>
+  // Sin video: se muestra la guía paso a paso (si existe). Nunca «Video próximamente».
+  if (!media) return guide ? <StepGuide guide={guide} compact={compact} /> : null;
+  return guide ? (
+    <div className="video-with-guide">
+      {media}
+      <StepGuide guide={guide} compact={compact} />
     </div>
+  ) : (
+    media
+  );
+}
+// Guía paso a paso (reemplaza los videos tutoriales): título, introducción, pasos numerados y un consejo.
+export function StepGuide({ guide, compact = false }) {
+  return (
+    <section
+      className={`step-guide ${compact ? "compact" : ""}`}
+      aria-label={guide.title}
+    >
+      <header>
+        <span className="icon-disc">
+          <Icon name={guide.icon} size={22} />
+        </span>
+        <div>
+          <span className="eyebrow">PASO A PASO</span>
+          <h3>{guide.title}</h3>
+          {guide.intro && <p>{guide.intro}</p>}
+        </div>
+      </header>
+      <ol>
+        {guide.steps.map(([title, text]) => (
+          <li key={title}>
+            <strong>{title}</strong>
+            <span>{text}</span>
+          </li>
+        ))}
+      </ol>
+      {guide.tip && (
+        <p className="step-tip">
+          <Lightbulb size={15} aria-hidden="true" /> {guide.tip}
+        </p>
+      )}
+    </section>
   );
 }
 export function AmbientVideo({ webm, mp4, poster }) {

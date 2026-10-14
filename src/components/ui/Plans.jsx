@@ -1,10 +1,7 @@
-import { useState } from "react";
-import { Clock3, Play, Stethoscope } from "lucide-react";
+import { Clock3, Stethoscope } from "lucide-react";
 import programa from "../../lib/content/programa";
-import { Badge, Button, Modal } from "./index";
-import { VideoSlot } from "../video/Video";
+import { Badge, Button } from "./index";
 export default function Plans({ full = false }) {
-  const [video, setVideo] = useState(null);
   return (
     <>
       <div className="plan-grid">
@@ -84,19 +81,9 @@ export default function Plans({ full = false }) {
             >
               {full ? "Solicitar este plan" : "Conocer el plan"}
             </Button>
-            {full && (
-              <button className="plan-video" onClick={() => setVideo(plan.id)}>
-                <Play size={13} /> Ver video del plan
-              </button>
-            )}
           </article>
         ))}
       </div>
-      {video && (
-        <Modal title="Conoce tu plan" onClose={() => setVideo(null)}>
-          <VideoSlot name={`plan_${video}`} />
-        </Modal>
-      )}
     </>
   );
 }

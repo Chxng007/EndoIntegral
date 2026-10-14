@@ -4443,3 +4443,357 @@ select[aria-invalid=true] {
         animation: none
     }
 }
+
+/* Guías paso a paso (reemplazan los videos tutoriales) */
+.step-guide {
+    border-radius: 22px;
+    padding: 28px;
+    border: 1px solid var(--border);
+    background: radial-gradient(ellipse at 100% 0%, #cbb4e64d, transparent 55%), linear-gradient(130deg, #fdf3f6, #f5effa)
+}
+
+.step-guide header {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 22px
+}
+
+.step-guide header .icon-disc {
+    flex: none
+}
+
+.step-guide h3 {
+    font-size: 24px;
+    margin: 4px 0 6px
+}
+
+.step-guide header p {
+    font-size: 13px;
+    color: var(--muted)
+}
+
+.step-guide ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
+    counter-reset: guia
+}
+
+.step-guide li {
+    position: relative;
+    padding: 16px 16px 16px 58px;
+    border-radius: 16px;
+    background: #fffdfbd9;
+    border: 1px solid #efe4f1;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--muted)
+}
+
+.step-guide li::before {
+    counter-increment: guia;
+    content: counter(guia);
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(135deg, var(--rose-cta), var(--lavender-deep))
+}
+
+.step-guide li strong {
+    display: block;
+    font-size: 13.5px;
+    color: var(--plum);
+    margin-bottom: 3px
+}
+
+.step-guide .step-tip {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 12px;
+    color: #6b5579;
+    background: #fff7dd;
+    border: 1px dashed #ecd28f
+}
+
+.step-guide .step-tip svg {
+    flex: none;
+    margin-top: 2px;
+    color: #b98a1f
+}
+
+.step-guide.compact {
+    padding: 22px
+}
+
+.video-with-guide {
+    display: grid;
+    gap: 18px
+}
+
+.validation .step-guide ol,
+.about-intro .step-guide ol,
+.contact-side .step-guide ol {
+    grid-template-columns: 1fr
+}
+
+@media (max-width: 760px) {
+    .step-guide {
+        padding: 20px
+    }
+
+    .step-guide ol {
+        grid-template-columns: 1fr
+    }
+}
+
+/* Lector tipo cartilla: hoja que gira sobre el lomo izquierdo */
+.doc-book {
+    position: relative;
+    margin: 0 auto;
+    perspective: 2400px;
+    perspective-origin: 30% 50%
+}
+
+.doc-sheet {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border-radius: 6px 12px 12px 6px;
+    background: #fff;
+    overflow: hidden;
+    cursor: zoom-in;
+    box-shadow: 0 22px 50px #3b2a4d2e, inset 6px 0 10px -6px #3b2a4d40
+}
+
+.doc-sheet img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain
+}
+
+.doc-zoom-hint {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b4a91;
+    background: #ffffffe6;
+    box-shadow: 0 4px 14px #3b2a4d26;
+    opacity: 0;
+    transition: opacity .2s
+}
+
+.doc-sheet:hover .doc-zoom-hint,
+.doc-sheet:focus-visible .doc-zoom-hint {
+    opacity: 1
+}
+
+.doc-leaf {
+    position: absolute;
+    inset: 0;
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    animation-timing-function: cubic-bezier(.45, .05, .25, 1);
+    animation-fill-mode: both;
+    pointer-events: none;
+    z-index: 2
+}
+
+.doc-leaf-front,
+.doc-leaf-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 6px 12px 12px 6px;
+    overflow: hidden
+}
+
+.doc-leaf-front {
+    background: #fff
+}
+
+.doc-leaf-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block
+}
+
+/* Reverso de la hoja: papel con un brillo suave, como una cartilla impresa. */
+.doc-leaf-back {
+    transform: rotateY(180deg);
+    background: linear-gradient(90deg, #ece2ea, #f8f2f0 45%, #fdfaf8)
+}
+
+.doc-leaf-front::after,
+.doc-leaf-back::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #3b2a4d00 40%, #3b2a4d38);
+    opacity: 0;
+    animation: leaf-light 760ms ease-in-out both
+}
+
+.turn-next {
+    animation-name: leaf-next
+}
+
+.turn-prev {
+    animation-name: leaf-prev
+}
+
+@keyframes leaf-next {
+    0% {
+        transform: rotateY(0deg)
+    }
+
+    100% {
+        transform: rotateY(-180deg)
+    }
+}
+
+@keyframes leaf-prev {
+    0% {
+        transform: rotateY(-180deg)
+    }
+
+    100% {
+        transform: rotateY(0deg)
+    }
+}
+
+@keyframes leaf-light {
+    0%,
+    100% {
+        opacity: 0
+    }
+
+    50% {
+        opacity: 1
+    }
+}
+
+/* Sombra que la hoja proyecta sobre la página de abajo mientras gira. */
+.doc-shade {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 6px 12px 12px 6px;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: both
+}
+
+.shade-next {
+    background: linear-gradient(90deg, #3b2a4d55, #3b2a4d00 70%);
+    animation-name: shade-next
+}
+
+.shade-prev {
+    background: linear-gradient(90deg, #3b2a4d00 30%, #3b2a4d45);
+    animation-name: shade-prev
+}
+
+@keyframes shade-next {
+    0% {
+        opacity: .9
+    }
+
+    100% {
+        opacity: 0
+    }
+}
+
+@keyframes shade-prev {
+    0% {
+        opacity: 0
+    }
+
+    100% {
+        opacity: .9
+    }
+}
+
+/* Vista ampliada para leer el texto pequeño */
+.doc-zoom {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    background: #2a1e35eb;
+    backdrop-filter: blur(4px)
+}
+
+.doc-zoom-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    color: #fff;
+    font-size: 13px
+}
+
+.doc-zoom-bar button {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--plum);
+    background: #fff
+}
+
+.doc-zoom-bar button:disabled {
+    opacity: .35
+}
+
+.doc-zoom-scroll {
+    flex: 1;
+    overflow: auto;
+    padding: 0 16px 24px;
+    -webkit-overflow-scrolling: touch
+}
+
+.doc-zoom-scroll img {
+    display: block;
+    width: min(100%, 1000px);
+    height: auto;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px #0006
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .doc-leaf,
+    .doc-shade {
+        display: none
+    }
+}
