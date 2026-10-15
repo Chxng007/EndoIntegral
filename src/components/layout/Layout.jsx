@@ -153,7 +153,7 @@ export function Footer() {
         </div>
         <div>
           <h3>Tu bienestar</h3>
-          <Link to={user ? "/app" : "/ingresar"}>{user ? "Mi espacio" : "Yo soy miembra"}</Link>
+          <Link to={user ? "/app" : "/ingresar"}>{user ? "Mi espacio" : "Ya tengo cuenta"}</Link>
           <Link to="/programa#planes">Encuentra tu plan</Link>
           <Link to="/privacidad">Tratamiento de datos</Link>
         </div>

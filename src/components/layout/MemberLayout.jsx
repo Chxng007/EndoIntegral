@@ -94,7 +94,7 @@ function PlanLocked({ module, profile }) {
 }
 const adminIcons = {
   "": LayoutDashboard,
-  miembras: Users,
+  usuarias: Users,
   mensajes: Mail,
   solicitudes: CalendarCheck,
   podcasts: Mic,

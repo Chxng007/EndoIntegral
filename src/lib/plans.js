@@ -30,7 +30,7 @@ export const firstName = (profile) => profile?.nombre?.trim().split(/\s+/)[0] ||
 // Secciones del panel del equipo (también se muestran en la barra lateral de las administradoras).
 export const adminSections = [
   ['', 'Resumen'],
-  ['miembras', 'Usuarias y equipo'],
+  ['usuarias', 'Usuarias y equipo'],
   ['mensajes', 'Mensajes'],
   ['solicitudes', 'Solicitudes'],
   ['podcasts', 'Podcasts'],

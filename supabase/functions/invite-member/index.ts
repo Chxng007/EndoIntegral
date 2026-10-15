@@ -7,7 +7,7 @@ const schema=z.object({nombre:z.string().trim().min(3).max(80),email:z.email(),p
 const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
 function temporaryPassword(){const bytes=crypto.getRandomValues(new Uint8Array(12));return Array.from(bytes,b=>alphabet[b%alphabet.length]).join('');}
 function invitation(nombre:string,email:string,password:string,rol:string){
- const site=siteUrl(),first=escapeHtml(capitalize(nombre.split(/\s+/)[0])),role=rol==='admin'?'administradora del equipo':'miembra';
+ const site=siteUrl(),first=escapeHtml(capitalize(nombre.split(/\s+/)[0])),role=rol==='admin'?'administradora del equipo':'usuaria';
  return {to:email,subject:'Tu invitación a EndoIntegral',title:`Te damos la bienvenida, ${first}`,
   body:`<p style="margin:0 0 16px">Te invitamos a EndoIntegral como <strong>${role}</strong>. Estos son tus datos para ingresar:</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f7eff8" style="background:#f7eff8;border:1px solid #eaddE9;border-radius:16px">

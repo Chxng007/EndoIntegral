@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import { Button, Loading } from "../components/ui";
 import Inicio from "../pages/public/Inicio";
@@ -90,7 +90,9 @@ export default function Router() {
             <Route path="admin" element={<MemberLayout />}>
               <Route element={<AdminLayout />}>
                 <Route index element={<AdminHome />} />
-                <Route path="miembras" element={<AdminMembers />} />
+                <Route path="usuarias" element={<AdminMembers />} />
+                {/* Dirección anterior: se conserva para enlaces guardados. */}
+                <Route path="miembras" element={<Navigate to="/admin/usuarias" replace />} />
                 <Route path="mensajes" element={<AdminInbox />} />
                 <Route
                   path="solicitudes"
