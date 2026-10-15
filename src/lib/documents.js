@@ -63,3 +63,49 @@ export function useResourceDocument(category) {
   }, [load]);
   return state;
 }
+// Videos propios destacados de un módulo (tabla featured_videos, mismo bucket privado).
+// El enlace dura 4 horas y no se renueva solo: cambiar la dirección cortaría la reproducción.
+const VIDEO_TTL = 4 * 60 * 60;
+export function useFeaturedVideos(category) {
+  const [state, setState] = useState({ status: "loading", videos: [] });
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      if (!supabase) return setState({ status: "ready", videos: [] });
+      const { data, error } = await supabase
+        .from("featured_videos")
+        .select("*")
+        .eq("categoria", category)
+        .order("orden");
+      if (!alive) return;
+      if (error) return setState({ status: "error", videos: [] });
+      const bucket = supabase.storage.from("resources");
+      const videos = await Promise.all(
+        (data || []).map(async (v) => {
+          const [video, poster] = await Promise.all([
+            bucket.createSignedUrl(v.video_path, VIDEO_TTL),
+            v.poster_path
+              ? bucket.createSignedUrl(v.poster_path, VIDEO_TTL)
+              : Promise.resolve({ data: null }),
+          ]);
+          return video.error
+            ? null
+            : {
+                id: v.id,
+                title: v.titulo,
+                description: v.descripcion,
+                ratio: v.proporcion,
+                duration: v.duracion_segundos,
+                src: video.data.signedUrl,
+                poster: poster.data?.signedUrl,
+              };
+        }),
+      );
+      if (alive) setState({ status: "ready", videos: videos.filter(Boolean) });
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [category]);
+  return state;
+}

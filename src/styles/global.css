@@ -4748,3 +4748,74 @@ select[aria-invalid=true] {
     border-color: #d9c2e4;
     background: #f6eef9
 }
+
+/* Video propio destacado (p. ej., yoga en Recursos) */
+.featured-video {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: center;
+    margin: 28px 0 34px;
+    padding: 24px;
+    border-radius: 24px;
+    border: 1px solid #e2d0ea;
+    background: radial-gradient(ellipse at 100% 0%, #cbb4e666, transparent 55%), linear-gradient(130deg, #fdf3f6, #f3ecfa)
+}
+
+.featured-video.is-vertical {
+    grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+    gap: 34px
+}
+
+.featured-video-player video {
+    display: block;
+    width: 100%;
+    max-height: 78vh;
+    border-radius: 18px;
+    background: #2a1e35;
+    box-shadow: 0 20px 45px #3b2a4d33;
+    object-fit: contain
+}
+
+.featured-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--rose-cta), var(--lavender-deep))
+}
+
+.featured-video-copy h2 {
+    font-size: 32px;
+    margin: 14px 0 10px
+}
+
+.featured-video-copy p {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 16px
+}
+
+@media (max-width: 860px) {
+    .featured-video,
+    .featured-video.is-vertical {
+        grid-template-columns: 1fr;
+        padding: 16px;
+        gap: 18px
+    }
+
+    .featured-video.is-vertical .featured-video-player {
+        max-width: 360px;
+        width: 100%;
+        margin: 0 auto
+    }
+
+    .featured-video-copy h2 {
+        font-size: 26px
+    }
+}

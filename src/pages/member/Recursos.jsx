@@ -9,6 +9,7 @@ import {
   Pause,
   Play,
   RotateCcw,
+  Star,
   Timer,
   Wind,
 } from "lucide-react";
@@ -22,7 +23,7 @@ import {
 } from "../../components/ui";
 import { VideoEmbed, VideoSlot } from "../../components/video/Video";
 import DocumentReader from "../../components/ui/DocumentReader";
-import { useResourceDocument } from "../../lib/documents";
+import { useFeaturedVideos, useResourceDocument } from "../../lib/documents";
 import { poses } from "../../lib/content/recursos";
 import { mindfulnessVideos, videos, yogaVideos } from "../../lib/videos";
 import { supabase } from "../../lib/supabase";
@@ -137,6 +138,52 @@ function softBell() {
     /* Audio is optional. */
   }
 }
+// Videos propios destacados del módulo (archivo en el almacenamiento protegido, no YouTube).
+function FeaturedVideos({ category }) {
+  const { status, videos } = useFeaturedVideos(category);
+  if (status !== "ready" || !videos.length) return null;
+  return videos.map((v) => {
+    const [w, h] = v.ratio.split("/").map((n) => Number(n.trim()) || 1);
+    const vertical = h > w;
+    return (
+      <section
+        key={v.id}
+        className={`featured-video ${vertical ? "is-vertical" : ""}`}
+        aria-label={v.title}
+      >
+        <div className="featured-video-player">
+          <video
+            controls
+            playsInline
+            preload="metadata"
+            poster={v.poster}
+            src={v.src}
+            style={{ aspectRatio: `${w} / ${h}` }}
+            controlsList="nodownload"
+            onContextMenu={(e) => e.preventDefault()}
+          >
+            Tu navegador no puede reproducir este video.
+          </video>
+        </div>
+        <div className="featured-video-copy">
+          <span className="featured-badge">
+            <Star size={13} fill="currentColor" /> VIDEO DESTACADO
+          </span>
+          <h2>{v.title}</h2>
+          {v.description && <p>{v.description}</p>}
+          {v.duration && (
+            <span className="pose-time">
+              <Timer size={12} />
+              {Math.floor(v.duration / 60)
+                ? `${Math.floor(v.duration / 60)} min ${v.duration % 60} s`
+                : `${v.duration} segundos`}
+            </span>
+          )}
+        </div>
+      </section>
+    );
+  });
+}
 export function BackToResources() {
   return (
     <Link to="/app/recursos" className="back-link">
@@ -191,6 +238,7 @@ export function Yoga() {
         o en posoperatorio. Adapta o evita las posturas que te causen molestias.
         La práctica es opcional y puedes detenerte en cualquier momento.
       </Notice>
+      <FeaturedVideos category="yoga" />
       <div className="yoga-grid">
         {poses.map((p, i) => (
           <article className="yoga-pose" key={p.name}>
