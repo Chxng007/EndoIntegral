@@ -131,7 +131,7 @@ export default function Programa() {
                   ["Eje predominante", ...content.plans.map((p) => p.lead)],
                   [
                     "Duración",
-                    ...content.plans.map((p) => `${p.weeks} semanas`),
+                    ...content.plans.map((p) => p.duration),
                   ],
                   [
                     "Aporte",

@@ -1,9 +1,9 @@
 // Módulos del área privada incluidos en cada plan, según «PDA 2da entrega» (planes 1, 2 y 3).
 // Debe coincidir con public.plan_allows() en supabase/migrations/202610060010_free_plan_signup.sql,
 // que es la que realmente protege los datos. 'ninguno' es la cuenta gratuita, sin módulos.
-export const planNames = { ninguno: 'Sin plan', aprende: 'Aprende', orienta: 'Orienta', diagnostico: 'Diagnosticadas' };
+export const planNames = { ninguno: 'Sin plan', aprende: 'Aprende', orienta: 'Orienta', diagnostico: 'Diagnósticada' };
 // Nombre completo con su número, como aparece en el programa.
-export const planLabels = { ninguno: 'Cuenta gratuita', aprende: 'Plan 1 · Aprende', orienta: 'Plan 2 · Orienta', diagnostico: 'Plan 3 · Diagnosticadas' };
+export const planLabels = { ninguno: 'Cuenta gratuita', aprende: 'Plan 1 · Aprende', orienta: 'Plan 2 · Orienta', diagnostico: 'Plan 3 · Diagnósticada' };
 export const paidPlans = ['aprende', 'orienta', 'diagnostico'];
 const ALL = ['endo-voces', 'acompanamiento', 'sintomas', 'foro', 'diario', 'cartilla', 'recursos'];
 export const planModules = {

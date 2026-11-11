@@ -805,6 +805,16 @@ a.benefit:hover {
     align-items: center
 }
 
+.team-video {
+    display: block;
+    width: 100%;
+    max-height: 520px;
+    object-fit: cover;
+    border: 1px solid #eadce9;
+    border-radius: 120px 120px 24px 24px;
+    background: #f5edf4;
+}
+
 .validation-copy h2 {
     font-size: 43px
 }
@@ -3113,6 +3123,11 @@ select[aria-invalid=true] {
     .validation {
         grid-template-columns: 1fr;
         gap: 35px
+    }
+
+    .team-video {
+        max-height: none;
+        border-radius: 100px 100px 20px 20px
     }
 
     .validation-copy h2 {

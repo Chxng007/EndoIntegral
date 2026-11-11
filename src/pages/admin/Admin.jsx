@@ -388,7 +388,7 @@ const subjectLabels = {
   general: "Información general",
   "plan-aprende": "Solicitud de plan · Plan 1 Aprende",
   "plan-orienta": "Solicitud de plan · Plan 2 Orienta",
-  "plan-diagnostico": "Solicitud de plan · Plan 3 Diagnosticadas",
+  "plan-diagnostico": "Solicitud de plan · Plan 3 Diagnósticada",
   acompanamiento: "Acompañamiento emocional",
   otro: "Otro",
 };

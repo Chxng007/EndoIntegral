@@ -12,7 +12,6 @@ import AnatomyViewer from "../../components/three/AnatomyViewer";
 import { Badge, Button, SectionTitle } from "../../components/ui";
 import Icon from "../../components/ui/Icon";
 import Plans from "../../components/ui/Plans";
-import { VideoSlot } from "../../components/video/Video";
 import content from "../../lib/content/inicio";
 import { useAuth } from "../../lib/auth";
 import { canAccess, firstName } from "../../lib/plans";
@@ -127,7 +126,16 @@ export default function Inicio() {
         </div>
       </section>
       <section className="container section-sm validation">
-        <VideoSlot name="inicio_validacion" />
+        <video
+          className="team-video"
+          controls
+          preload="metadata"
+          playsInline
+          aria-label="Video del equipo EndoIntegral"
+        >
+          <source src="/video-equipo-endointegral.mp4" type="video/mp4" />
+          Tu navegador no puede reproducir este video.
+        </video>
         <div className="validation-copy">
           <p className="eyebrow">TE CREEMOS. TE ESCUCHAMOS.</p>
           <h2>

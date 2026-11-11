@@ -13,7 +13,7 @@ const subjects = {
   general: "Información general",
   "plan-aprende": "Solicitar Plan 1 · Aprende",
   "plan-orienta": "Solicitar Plan 2 · Orienta",
-  "plan-diagnostico": "Solicitar Plan 3 · Diagnosticadas",
+  "plan-diagnostico": "Solicitar Plan 3 · Diagnósticada",
   acompanamiento: "Acompañamiento emocional",
   otro: "Otro",
 };

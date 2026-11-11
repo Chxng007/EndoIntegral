@@ -19,7 +19,7 @@ export default function Plans({ full = false }) {
             <p>Para {plan.audience}</p>
             <span className="plan-duration">
               <Clock3 size={14} />
-              {plan.weeks} semanas
+              {plan.duration}
             </span>
             <p className="plan-price">
               <strong>{plan.price}</strong> <span>{plan.priceNote}</span>
@@ -56,7 +56,7 @@ export default function Plans({ full = false }) {
                     <summary>
                       {plan.id === "diagnostico"
                         ? "Las 10 sesiones de tu proceso"
-                        : `Cronograma de ${plan.weeks} semanas`}
+                        : `Cronograma de ${plan.duration}`}
                     </summary>
                     <ol>
                       {plan.schedule.map(([title, text]) => (

@@ -40,8 +40,8 @@ export default {
       number: 1,
       name: "Aprende",
       tagline: "Educación, sensibilización y autocuidado",
-      weeks: 4,
-      price: "$220.000",
+      duration: "6 horas",
+      price: "$180.000",
       priceNote: "COP por participante",
       audience:
         "mujeres con dudas, síntomas, diagnóstico de endometriosis o interés en conocer más sobre la enfermedad. También familiares, parejas, cuidadores y comunidad en general.",
@@ -71,8 +71,8 @@ export default {
       number: 2,
       name: "Orienta",
       tagline: "Detección y diagnóstico con acompañamiento interdisciplinario",
-      weeks: 8,
-      price: "$1.550.000",
+      duration: "4 meses",
+      price: "$2.500.000",
       priceNote: "COP por paciente",
       audience:
         "mujeres con síntomas compatibles o sospecha de endometriosis que aún no cuentan con un diagnóstico confirmado.",
@@ -159,10 +159,10 @@ export default {
     {
       id: "diagnostico",
       number: 3,
-      name: "Diagnosticadas",
+      name: "Diagnósticada",
       tagline: "Seguimiento integral con prioridad en salud mental",
-      weeks: 10,
-      price: "$2.200.000",
+      duration: "6 meses",
+      price: "$3.700.000",
       priceNote: "COP por paciente",
       audience:
         "mujeres con diagnóstico confirmado de endometriosis que requieren acompañamiento durante el tratamiento y seguimiento de su bienestar físico y emocional.",

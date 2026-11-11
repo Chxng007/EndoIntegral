@@ -51,7 +51,7 @@ function FreeHome({ profile }) {
             <h3>{plan.name}</h3>
             <p className="free-plan-tagline">{plan.tagline}</p>
             <p className="free-plan-meta">
-              <Clock3 size={13} /> {plan.weeks} semanas · {plan.price}{" "}
+              <Clock3 size={13} /> {plan.duration} · {plan.price}{" "}
               {plan.priceNote}
             </p>
             <p className="free-plan-modules">

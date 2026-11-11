@@ -65,7 +65,7 @@ export const guias = {
     intro: "Empezar es más sencillo de lo que parece:",
     steps: [
       ["Infórmate", "En «Hablemos de endometriosis» encuentras información clara y sin tecnicismos."],
-      ["Conoce los planes", "Revisa los planes Aprende, Orienta y Diagnosticadas y elige el que acompaña tu momento."],
+      ["Conoce los planes", "Revisa los planes Aprende, Orienta y Diagnósticada y elige el que acompaña tu momento."],
       ["Crea tu cuenta gratis", "Desde «Mi cuenta → Crear cuenta gratis». Solo necesitas tu nombre, correo y una contraseña."],
       ["Solicita tu plan", "Envía la solicitud con tu celular; el equipo te escribe para coordinar tu inscripción."],
     ],
